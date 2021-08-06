@@ -14,6 +14,10 @@ header {
   @apply flex justify-between
 }
 
+main {
+  @apply grid justify-items-center
+}
+
 h1 {
   @apply text-5xl sm:text-2xl md:text-4xl
 }
