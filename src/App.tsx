@@ -1,10 +1,10 @@
-import './App.css';
+// import "./styles/index.css";
 
 function App() {
   return (
-    <div>
-      <h1>SourceType</h1>
-    </div>
+    <>
+      <h1 className="md:text-5xl">SourceType</h1>
+    </>
   );
 }
 
