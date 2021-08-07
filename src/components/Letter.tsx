@@ -1,8 +1,14 @@
 import { FC } from "react";
 
+export enum LetterState {
+  Untyped,
+  Typed,
+  Mistyped,
+}
+
 interface LetterProp {
   letter: string;
-  state: "untyped" | "typed" | "mistyped";
+  state: LetterState;
 }
 
 export const Letter: FC<LetterProp> = (props) => {
