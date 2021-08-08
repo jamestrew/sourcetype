@@ -6,12 +6,12 @@ export const LetterState = {
   incorrect: "text-red-500",
 };
 
-interface LetterProp {
+interface ILetter {
   letter: string;
   state?: string;
 }
 
-export const Letter: FC<LetterProp> = (props) => {
+export const Letter: FC<ILetter> = (props) => {
   return (
     <span className={props.state ?? LetterState.untyped}>{props.letter}</span>
   );
