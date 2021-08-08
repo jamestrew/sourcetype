@@ -1,16 +1,18 @@
 import { FC } from "react";
 
-export enum LetterState {
-  Untyped,
-  Typed,
-  Mistyped,
-}
+export const LetterState = {
+  untyped: "text-gray-500",
+  correct: "text-black",
+  incorrect: "text-red-500",
+};
 
 interface LetterProp {
   letter: string;
-  state: LetterState;
+  state?: string;
 }
 
 export const Letter: FC<LetterProp> = (props) => {
-  return <>{props.letter}</>;
+  return (
+    <span className={props.state ?? LetterState.untyped}>{props.letter}</span>
+  );
 };

@@ -11,11 +11,14 @@ function Practice() {
     <main>
       <p>&laquo;main content&raquo;</p>
       <input autoComplete="off" autoFocus onKeyDown={handleKeyDown} />
-      <Letter letter={"h"} state={LetterState.Untyped} />
-      <Letter letter={"e"} state={LetterState.Untyped} />
-      <Letter letter={"l"} state={LetterState.Untyped} />
-      <Letter letter={"l"} state={LetterState.Untyped} />
-      <Letter letter={"o"} state={LetterState.Untyped} />
+      {/* TODO: create a words class? */}
+      <div className="words">
+        <Letter letter="h" state={LetterState.correct} />
+        <Letter letter="e" state={LetterState.correct} />
+        <Letter letter="l" state={LetterState.incorrect} />
+        <Letter letter="l" state={LetterState.correct} />
+        <Letter letter="o" />
+      </div>
     </main>
   );
 }
