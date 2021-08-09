@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Letter, LetterState } from "components/Letter";
 
 interface IWord {
@@ -15,9 +15,9 @@ interface IStateWord {
 }
 
 const Word: React.FC<IWord> = ({ text, value }) => {
-  const [chars, setChars] = React.useState<IStateWord["element"]>([]);
+  const [chars, setChars] = useState<IStateWord["element"]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const spreadWord = text.split("");
     let spreadTyped: IStateWord["element"] = [];
     spreadTyped = [
