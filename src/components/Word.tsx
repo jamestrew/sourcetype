@@ -56,7 +56,7 @@ const Word: React.FC<IWord> = ({ text, value }) => {
 };
 
 Word.defaultProps = {
-  value: []
-}
+  value: [],
+};
 
 export { Word };
