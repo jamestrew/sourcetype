@@ -21,7 +21,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       return;
     console.log("detected keypress: ".concat(event.key));
 
-    setCursorPos((cursorPos) => {
+    setCursorPos(() => {
       return {
         x:
           event.key === "Backspace"
@@ -31,14 +31,21 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       };
     });
 
-    setTyped((typed) => {
-      // temporary
-      // want to nest words into an array
-      // eg. [['t', 'h', 'e', ' '], ['q', 'u', 'i', 'c', 'k',' '], ...]
-      const letter = [event.key];
-      return [...typed, letter];
+    // eg. [['t', 'h', 'e', ' '], ['q', 'u', 'i', 'c', 'k',' '], ...]
+    setTyped(() => {
+      if (typed.length === 0) {
+        const letter = [event.key];
+        return [...typed, letter];
+      } else {
+        const oldWords = typed.slice(0, -1);
+        const currWord = typed[typed.length - 1];
+        if (event.key !== " ") {
+          return [...oldWords, [...currWord, event.key]];
+        } else {
+          return [...oldWords, [...currWord, event.key], []];
+        }
+      }
     });
-    console.log(typed);
   };
 
   return (
