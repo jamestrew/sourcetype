@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { KeyboardEvent, useState } from "react";
+import { KeyboardEvent, FC, useState } from "react";
+import { invalidInputs } from "utils/input";
 import { Cursor } from "./Cursor";
 import { Word } from "./Word";
 
@@ -14,6 +14,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
+    if (invalidInputs.includes(event.key)) return;
     console.log("detected keypress: ".concat(event.key));
 
     // TODO: make conditions for backspace
@@ -34,7 +35,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         tabIndex={0}
         autoComplete="off"
         autoFocus
-        onKeyPress={handleKeyDown}
+        onKeyDown={handleKeyDown}
       />
       <div className="word-wrapper">
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
