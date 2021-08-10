@@ -3,7 +3,7 @@ import { Letter, LetterState } from "components/Letter";
 
 interface IWord {
   text: string;
-  value: string[];
+  value?: string[];
 }
 
 interface IStateWord {
@@ -20,6 +20,8 @@ const Word: React.FC<IWord> = ({ text, value }) => {
   useEffect(() => {
     const spreadWord = text.split("");
     let spreadTyped: IStateWord["element"] = [];
+
+    if (!value) return;
     spreadTyped = [
       ...value.map((ch, i) => ({
         index: i,
@@ -52,5 +54,9 @@ const Word: React.FC<IWord> = ({ text, value }) => {
     </div>
   );
 };
+
+Word.defaultProps = {
+  value: []
+}
 
 export { Word };
