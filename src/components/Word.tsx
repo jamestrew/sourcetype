@@ -15,6 +15,7 @@ interface IStateWord {
 }
 
 const Word: React.FC<IWord> = ({ text, value }) => {
+  const originWord = text.split("");
   const [chars, setChars] = useState<IStateWord["element"]>([]);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const Word: React.FC<IWord> = ({ text, value }) => {
       {chars.map((ch, i) => (
         <Letter
           key={i}
-          letter={i < text.length ? text.split("")[i] : ch.char}
+          letter={i < text.length ? originWord[i] : ch.char}
           state={
             ch.isHit == null
               ? LetterState.untyped
