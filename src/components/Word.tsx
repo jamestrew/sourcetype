@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Letter } from "./Letter";
+import { Letter, LetterState } from "./Letter";
 
 interface IWord {
   word: string;
@@ -12,9 +12,18 @@ export const Word: FC<IWord> = ({ word, typed }) => {
   // maybe wrap in span to add styling when word is active/wrong
   return (
     <>
-      {letters.map((letter, index) => (
-        <Letter key={index} letter={letter} />
-      ))}
+      {letters.map((letter, index) => {
+        let printLetter = letter;
+        let letterState = LetterState.untyped;
+        if (typed != null && typed[index] != null) {
+          printLetter = letter === typed[index] ? letter : typed[index];
+          letterState =
+            letter === typed[index]
+              ? LetterState.correct
+              : LetterState.incorrect;
+        }
+        return <Letter key={index} letter={printLetter} state={letterState} />;
+      })}
     </>
   );
 };
