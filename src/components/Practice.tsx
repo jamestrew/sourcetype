@@ -7,10 +7,6 @@ function Practice() {
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    // TODO: need to filter out more keys and probably want a better way
-    if (event.key === "Shift" || event.key === "Control") {
-      return;
-    }
     console.log("detected keypress: ".concat(event.key));
 
     setCursorPos((cursorPos) => {
@@ -21,7 +17,7 @@ function Practice() {
   return (
     <main>
       <p>&laquo;main content&raquo;</p>
-      <input autoComplete="off" autoFocus onKeyDown={handleKeyDown} />
+      <input autoComplete="off" autoFocus onKeyPress={handleKeyDown} />
       <div className="word-wrapper">
         {/* TODO: create a words class? */}
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
