@@ -8,12 +8,8 @@ interface IWord {
 
 export const Word: FC<IWord> = ({ word, typed }) => {
   const letters = word.split("");
-  console.log(letters);
-  // return (
-  // {letters.map((letter, index) => {
-  //   <Letter key={index} letter={letter} />
-  // })}
-  // )
+
+  // maybe wrap in span to add styling when word is active/wrong
   return (
     <>
       {letters.map((letter, index) => (

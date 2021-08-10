@@ -7,24 +7,38 @@ interface ICodeWrapper {
   codeBlock: string;
 }
 
+const cursorJump = 7; // TODO: this will have to be tweaked based on font size
+
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const words = codeBlock.split(" "); // FIX: this fucks any spacing
   const [cursorPos, setCursorPos] = useState({ x: 1, y: 25 });
-  const [typed, setTyped] = useState<string[]>([]);
+  const [typed, setTyped] = useState<string[][]>([]);
+  console.log(typed);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    if (invalidInputs.includes(event.key)) return;
+    if (invalidInputs.includes(event.key) || typeof event.key === "undefined")
+      return;
     console.log("detected keypress: ".concat(event.key));
 
-    // TODO: make conditions for backspace
-    // do we allow arrow keys and if so handle delete
     setCursorPos((cursorPos) => {
-      return { x: cursorPos.x + 7, y: cursorPos.y };
+      return {
+        x:
+          event.key === "Backspace"
+            ? cursorPos.x - cursorJump
+            : cursorPos.x + cursorJump,
+        y: cursorPos.y,
+      };
     });
+
     setTyped((typed) => {
-      return [...typed, event.key];
+      // temporary
+      // want to nest words into an array
+      // eg. [['t', 'h', 'e', ' '], ['q', 'u', 'i', 'c', 'k',' '], ...]
+      const letter = [event.key];
+      return [...typed, letter];
     });
+    console.log(typed);
   };
 
   return (
@@ -40,7 +54,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       <div className="word-wrapper">
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
         {words.map((word, index) => (
-          <Word key={index} word={word + " "} typed={typed} />
+          <Word key={index} word={word + " "} typed={typed[index]} />
         ))}
       </div>
     </main>

@@ -1,4 +1,4 @@
-export const invalidInputs: (string | undefined)[] = [
+export const invalidInputs: string[] = [
   "ContextMenu",
   "Escape",
   "Shift",
@@ -50,5 +50,4 @@ export const invalidInputs: (string | undefined)[] = [
   "F10",
   "F11",
   "F12",
-  undefined,
 ];
