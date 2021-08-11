@@ -11,8 +11,6 @@ interface ILetter {
   state?: string;
 }
 
-export const Letter: FC<ILetter> = (props) => {
-  return (
-    <span className={props.state ?? LetterState.untyped}>{props.letter}</span>
-  );
+export const Letter: FC<ILetter> = ({ letter, state }) => {
+  return <span className={state ?? LetterState.untyped}>{letter}</span>;
 };
