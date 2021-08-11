@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Letter, LetterState } from "components/Letter";
 
 interface IWord {
@@ -16,33 +16,32 @@ interface IStateWord {
 
 const Word: React.FC<IWord> = ({ text, value }) => {
   const originWord = text.split("");
-  const [chars, setChars] = useState<IStateWord["element"]>([]);
 
-  useEffect(() => {
-    const spreadWord = text.split("");
+  const createWord = () => {
     let spreadTyped: IStateWord["element"] = [];
 
-    if (!value) return;
-    spreadTyped = [
-      ...value.map((ch, i) => ({
-        index: i,
-        char: ch,
-        isHit: ch === spreadWord[i],
-      })),
-      ...spreadWord.splice(value.length).map((ch, i) => ({
-        index: value.length + i,
-        char: ch,
-      })),
-    ];
-    setChars(spreadTyped);
-  }, [text, value]);
+    if (value) {
+      spreadTyped = [
+        ...value.map((ch, i) => ({
+          index: i,
+          char: (i >= originWord.length ? ch : originWord[i]),
+          isHit: ch === originWord[i],
+        })),
+        ...originWord.splice(value.length).map((ch, i) => ({
+          index: value.length + i,
+          char: ch,
+        })),
+      ];
+    }
+    return spreadTyped;
+  };
 
   return (
     <div className="Word">
-      {chars.map((ch, i) => (
+      {createWord().map((ch, i) => (
         <Letter
           key={i}
-          letter={i < text.length ? originWord[i] : ch.char}
+          letter={ch.char}
           state={
             ch.isHit == null
               ? LetterState.untyped
@@ -54,10 +53,6 @@ const Word: React.FC<IWord> = ({ text, value }) => {
       ))}
     </div>
   );
-};
-
-Word.defaultProps = {
-  value: [],
 };
 
 export { Word };
