@@ -10,8 +10,9 @@ export const Word: FC<IWord> = ({ word, typed }) => {
   const letters = word.split("");
 
   // maybe wrap in span to add styling when word is active/wrong
+  // https://tailwindcss.com/docs/text-decoration --> underline
   return (
-    <>
+    <span>
       {letters.map((letter, index) => {
         let printLetter = letter;
         let letterState = LetterState.untyped;
@@ -24,6 +25,6 @@ export const Word: FC<IWord> = ({ word, typed }) => {
         }
         return <Letter key={index} letter={printLetter} state={letterState} />;
       })}
-    </>
+    </span>
   );
 };
