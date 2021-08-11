@@ -24,7 +24,7 @@ const Word: React.FC<IWord> = ({ text, value }) => {
       spreadTyped = [
         ...value.map((ch, i) => ({
           index: i,
-          char: (i >= originWord.length ? ch : originWord[i]),
+          char: i >= originWord.length ? ch : originWord[i],
           isHit: ch === originWord[i],
         })),
         ...originWord.splice(value.length).map((ch, i) => ({
