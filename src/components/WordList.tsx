@@ -21,16 +21,19 @@ const WordList: React.FC<IWordList> = ({ next, children }) => {
     if (!next) return;
     const currLength = prog.current.length;
 
-    if (next.length === currLength || next.length === 0) return;
-    const key = next[next.length - 1];
-    if (key === " ") {
-      prog.current.push({
-        wordId: prog.current[currLength - 1].wordId + 1,
-        letter: key,
-      });
+    if (next.length === currLength) {
+      return;
+    } else if (next.length < currLength) {
+      prog.current.pop();
     } else {
+      const key = next[next.length - 1];
+      let nextId = currLength > 0 ? prog.current[currLength - 1].wordId : 0;
+
+      if (key === " ") {
+        nextId += 1;
+      }
       prog.current.push({
-        wordId: currLength > 0 ? prog.current[currLength - 1].wordId : 0,
+        wordId: nextId,
         letter: key,
       });
     }
