@@ -7,12 +7,12 @@ interface ICodeWrapper {
   codeBlock: string;
 }
 
-const cursorJump = 7; // TODO: this will have to be tweaked based on font size
+const cursorJump = 7.5; // TODO: this will have to be tweaked based on font size
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const words = codeBlock.split(" "); // FIX: this fucks any spacing
   const [cursorPos, setCursorPos] = useState({ x: 1, y: 25 });
-  const [typed, setTyped] = useState<string[][]>([]); // TODO: this can be reduced to just an array
+  const [typed, setTyped] = useState<string[]>([]); // TODO: this can be reduced to just an array
   console.log(typed);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -31,20 +31,21 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       };
     });
 
-    // eg. [['t', 'h', 'e', ' '], ['q', 'u', 'i', 'c', 'k',' '], ...]
-    // TODO: convert to just a list
+    // eg. ['the ', 'quick ', ...]
     // TODO: add backpace support
     setTyped(() => {
       if (typed.length === 0) {
-        const letter = [event.key];
-        return [...typed, letter];
+        return [event.key];
       } else {
         const oldWords = typed.slice(0, -1);
         const currWord = typed[typed.length - 1];
-        if (event.key !== " ") {
-          return [...oldWords, [...currWord, event.key]];
+        const lastLetter = currWord.slice(-1)
+        if (lastLetter !== " ") {
+          const updatedWord = currWord + event.key;
+          return [...oldWords, updatedWord];
         } else {
-          return [...oldWords, [...currWord, event.key], []];
+          console.log('brand new word')
+          return [...typed, event.key];
           // TODO: check out below
           // let extraSpace = typed[typed.length - 1].length === 0
           // return (extraSpace ? [...oldWords, []] : [...oldWords, [...currWord], []]);

@@ -3,7 +3,7 @@ import { Letter, LetterState } from "./Letter";
 
 interface IWord {
   word: string;
-  typed: string[];
+  typed: string;
 }
 
 export const Word: FC<IWord> = ({ word, typed }) => {
