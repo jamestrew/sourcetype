@@ -63,7 +63,7 @@ div {
 }
 
 .WordList {
-  @apply flex flex-wrap text-4xl;
+  @apply w-4/5 py-8 flex flex-wrap text-4xl;
 }
 
 .Word {
