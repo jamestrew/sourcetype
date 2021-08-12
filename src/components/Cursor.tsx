@@ -6,14 +6,14 @@ interface ICursor {
   hidden: boolean;
 }
 
-export const Cursor: FC<ICursor> = (props) => {
+export const Cursor: FC<ICursor> = ({ xpad, ypad, hidden }) => {
   return (
     <div
       id="cursor"
-      className={props.hidden ? "hidden" : ""}
+      className={hidden ? "hidden" : ""}
       style={{
-        left: `${props.xpad}px`,
-        top: `${props.ypad}px`,
+        left: `${xpad}px`,
+        top: `${ypad}px`,
       }}
     ></div>
   );
