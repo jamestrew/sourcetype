@@ -12,8 +12,8 @@ export const Cursor: FC<ICursor> = ({ xpad, ypad, hidden }) => {
       id="cursor"
       className={hidden ? "hidden" : ""}
       style={{
-        left: `${xpad}px`,
-        top: `${ypad}px`,
+        left: `${xpad}em`,
+        top: `${ypad}em`,
       }}
     ></div>
   );

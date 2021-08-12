@@ -2,7 +2,9 @@ import { CodeWrapper } from "./CodeWrapper";
 
 function Practice() {
   return (
-    <CodeWrapper codeBlock="The quick brown fox jumped over the lazy dog" />
+    <main>
+      <CodeWrapper codeBlock="The quick brown fox jumped over the lazy dog" />
+    </main>
   );
 }
 
