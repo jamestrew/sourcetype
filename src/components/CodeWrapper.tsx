@@ -48,7 +48,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         autoFocus
       />
       <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
-      <code className="w-4/5 py-8 overflow-x-visible">
+      <code className="w-4/5 py-8">
         <WordList next={typed}>{codeBlock}</WordList>
       </code>
     </main>
