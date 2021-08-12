@@ -4,6 +4,7 @@ import { Letter, LetterState } from "components/Letter";
 interface IWord {
   text: string;
   value?: string[];
+  isComplete?: boolean;
 }
 
 interface IStateWord {
@@ -14,7 +15,7 @@ interface IStateWord {
   }[];
 }
 
-const Word: React.FC<IWord> = ({ text, value }) => {
+const Word: React.FC<IWord> = ({ text, value, isComplete }) => {
   const originWord = text.split("");
 
   const createWord = () => {
@@ -30,6 +31,7 @@ const Word: React.FC<IWord> = ({ text, value }) => {
         ...originWord.splice(value.length).map((ch, i) => ({
           index: value.length + i,
           char: ch,
+          isHit: isComplete ? !isComplete : undefined
         })),
       ];
     }

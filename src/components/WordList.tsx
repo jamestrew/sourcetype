@@ -46,10 +46,14 @@ const WordList: React.FC<IWordList> = ({ next, children }) => {
     return prog.current.filter((p) => p.wordId === id && p.letter !== " ");
   };
 
+  const checkComplete = (id: number) => {
+    return prog.current.filter((p) => p.wordId === id + 1).length > 0
+  }
+
   return (
     <div className="WordList">
       {tokenizedChild.map((wd, i) => (
-        <Word key={i} text={wd} value={fetchWord(i).map((i) => i.letter)} />
+        <Word key={i} text={wd} value={fetchWord(i).map((i) => i.letter)} isComplete={checkComplete(i)} />
       ))}
     </div>
   );
