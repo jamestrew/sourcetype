@@ -30,6 +30,10 @@ div {
   @apply outline-black;
 }
 
+input {
+  @apply rounded border-2 border-gray-500 outline-none h-10 w-1/4
+}
+
 #cursor {
   height: 1.5rem;
   position: relative;
