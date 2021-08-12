@@ -14,14 +14,13 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const [typed, setTyped] = useState<string[]>([]);
 
   const getCursorMovement = (key: string) => {
-    return {
-      x:
-        key === "Backspace"
-          ? cursorPos.x - cursorJump
-          : cursorPos.x + cursorJump,
-      y: cursorPos.y,
-    };
-  };
+    if (key === "Backspace") {
+      cursorPos.x -= cursorJump;
+    } else {
+      cursorPos.x += cursorJump;
+    }
+    return cursorPos;
+  }
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();

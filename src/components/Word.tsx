@@ -36,20 +36,17 @@ const Word: React.FC<IWord> = ({ text, value, isComplete }) => {
     return spreadTyped;
   };
 
+  const getState = (hitCheck: boolean | undefined) => {
+    if (hitCheck === undefined) {
+      return LetterState.untyped;
+    }
+    return hitCheck ? LetterState.correct : LetterState.incorrect;
+  };
+
   return (
     <div className="Word">
       {createWord().map((ch, i) => (
-        <Letter
-          key={i}
-          letter={ch.char}
-          state={
-            ch.isHit == null
-              ? LetterState.untyped
-              : ch.isHit
-              ? LetterState.correct
-              : LetterState.incorrect
-          }
-        />
+        <Letter key={i} letter={ch.char} state={getState(ch.isHit)} />
       ))}
     </div>
   );
