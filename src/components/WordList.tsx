@@ -24,9 +24,7 @@ const WordList: React.FC<IWordList> = ({ next, children }) => {
     if (next.length === currLength) {
       return;
     } else if (next.length < currLength) {
-      for (let i = next.length; i < currLength; ++i) {
-        prog.current.pop();
-      }
+      prog.current = prog.current.splice(0, next.length)
     } else {
       const key = next[next.length - 1];
       let nextId = currLength > 0 ? prog.current[currLength - 1].wordId : 0;
