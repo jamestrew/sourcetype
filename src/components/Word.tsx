@@ -31,7 +31,7 @@ const Word: React.FC<IWord> = ({ text, value, isComplete }) => {
         ...originWord.splice(value.length).map((ch, i) => ({
           index: value.length + i,
           char: ch,
-          isHit: isComplete ? !isComplete : undefined
+          isHit: isComplete ? !isComplete : undefined,
         })),
       ];
     }
