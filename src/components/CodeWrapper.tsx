@@ -14,13 +14,13 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const [typed, setTyped] = useState<string[]>([]);
 
   const getCursorMovement = (key: string) => {
-    return ({
+    return {
       x:
         key === "Backspace"
           ? cursorPos.x - cursorJump
           : cursorPos.x + cursorJump,
       y: cursorPos.y,
-    });
+    };
   };
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -32,7 +32,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       typed.push(event.key);
     }
     setTyped([...typed]);
-    setCursorPos(getCursorMovement(event.key))
+    setCursorPos(getCursorMovement(event.key));
     console.log(typed.reduce((r, i) => r + i, ""));
   };
 
@@ -48,7 +48,9 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         autoFocus
       />
       <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
-      <WordList next={typed}>{codeBlock}</WordList>
+      <code className="w-4/5 py-8 overflow-x-visible">
+        <WordList next={typed}>{codeBlock}</WordList>
+      </code>
     </main>
   );
 };

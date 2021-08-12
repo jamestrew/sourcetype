@@ -61,3 +61,11 @@ div {
   /* outline: none; */
   /* display: block; */
 }
+
+.WordList {
+  @apply flex flex-wrap text-4xl;
+}
+
+.Word {
+  padding: 0em 0.25em;
+}
