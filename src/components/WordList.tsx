@@ -6,15 +6,13 @@ interface IWordList {
   children?: string;
 }
 
-interface IStateWordList {
-  wordElements: {
-    wordId: number;
-    letter: string;
-  }[];
+interface IWordListElement {
+  wordId: number;
+  letter: string;
 }
 
 const WordList: React.FC<IWordList> = ({ next, children }) => {
-  const prog = useRef<IStateWordList["wordElements"]>([]);
+  const prog = useRef<IWordListElement[]>([]);
   const tokenizedChild = children ? children.split(" ") : [];
 
   const tokenizeValue = () => {
