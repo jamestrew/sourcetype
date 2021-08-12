@@ -1,30 +1,55 @@
-import { FC } from "react";
-import { Letter, LetterState } from "./Letter";
+import React from "react";
+import { Letter, LetterState } from "components/Letter";
 
 interface IWord {
-  word: string;
-  typed: string;
+  text: string;
+  value?: string[];
+  isComplete?: boolean;
 }
 
-export const Word: FC<IWord> = ({ word, typed }) => {
-  const letters = word.split("");
+interface IWordElement {
+  index: number;
+  char: string;
+  isHit?: boolean;
+}
 
-  // maybe wrap in span to add styling when word is active/wrong
-  // https://tailwindcss.com/docs/text-decoration --> underline
+const Word: React.FC<IWord> = ({ text, value, isComplete }) => {
+  const originWord = text.split("");
+
+  const createWord = () => {
+    let spreadTyped: IWordElement[] = [];
+
+    if (value) {
+      spreadTyped = [
+        ...value.map((ch, i) => ({
+          index: i,
+          char: i >= originWord.length ? ch : originWord[i],
+          isHit: ch === originWord[i],
+        })),
+        ...originWord.splice(value.length).map((ch, i) => ({
+          index: value.length + i,
+          char: ch,
+          isHit: isComplete ? !isComplete : undefined,
+        })),
+      ];
+    }
+    return spreadTyped;
+  };
+
+  const getState = (hitCheck: boolean | undefined) => {
+    if (hitCheck === undefined) {
+      return LetterState.untyped;
+    }
+    return hitCheck ? LetterState.correct : LetterState.incorrect;
+  };
+
   return (
-    <span>
-      {letters.map((letter, index) => {
-        let printLetter = letter;
-        let letterState = LetterState.untyped;
-        if (typed != null && typed[index] != null) {
-          printLetter = letter === typed[index] ? letter : typed[index];
-          letterState =
-            letter === typed[index]
-              ? LetterState.correct
-              : LetterState.incorrect;
-        }
-        return <Letter key={index} letter={printLetter} state={letterState} />;
-      })}
-    </span>
+    <div className="Word">
+      {createWord().map((ch, i) => (
+        <Letter key={i} letter={ch.char} state={getState(ch.isHit)} />
+      ))}
+    </div>
   );
 };
+
+export { Word };

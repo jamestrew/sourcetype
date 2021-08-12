@@ -1,7 +1,7 @@
 import { KeyboardEvent, FC, useState } from "react";
-import { invalidInputs } from "../utils/input";
+// import { invalidInputs } from "../utils/input";
 import { Cursor } from "./Cursor";
-import { Word } from "./Word";
+import { WordList } from "components/WordList";
 
 interface ICodeWrapper {
   codeBlock: string;
@@ -10,48 +10,29 @@ interface ICodeWrapper {
 const cursorJump = 7.5; // TODO: this will have to be tweaked based on font size
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
-  const words = codeBlock.split(" "); // FIX: this fucks any spacing
   const [cursorPos, setCursorPos] = useState({ x: 1, y: 25 });
-  const [typed, setTyped] = useState<string[]>([]); // TODO: this can be reduced to just an array
-  console.log(typed);
+  const [typed, setTyped] = useState<string[]>([]);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const getCursorMovement = (key: string) => {
+    if (key === "Backspace") {
+      cursorPos.x -= cursorJump;
+    } else {
+      cursorPos.x += cursorJump;
+    }
+    return cursorPos;
+  }
+
+  const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    if (invalidInputs.includes(event.key) || typeof event.key === "undefined")
-      return;
-    console.log("detected keypress: ".concat(event.key));
 
-    setCursorPos(() => {
-      return {
-        x:
-          event.key === "Backspace"
-            ? cursorPos.x - cursorJump
-            : cursorPos.x + cursorJump,
-        y: cursorPos.y,
-      };
-    });
-
-    // eg. ['the ', 'quick ', ...]
-    // TODO: add backpace support
-    setTyped(() => {
-      if (typed.length === 0) {
-        return [event.key];
-      } else {
-        const oldWords = typed.slice(0, -1);
-        const currWord = typed[typed.length - 1];
-        const lastLetter = currWord.slice(-1)
-        if (lastLetter !== " ") {
-          const updatedWord = currWord + event.key;
-          return [...oldWords, updatedWord];
-        } else {
-          console.log('brand new word')
-          return [...typed, event.key];
-          // TODO: check out below
-          // let extraSpace = typed[typed.length - 1].length === 0
-          // return (extraSpace ? [...oldWords, []] : [...oldWords, [...currWord], []]);
-        }
-      }
-    });
+    if (event.key === "Backspace") {
+      typed.pop();
+    } else {
+      typed.push(event.key);
+    }
+    setTyped([...typed]);
+    setCursorPos(getCursorMovement(event.key));
+    console.log(typed.reduce((r, i) => r + i, ""));
   };
 
   return (
@@ -61,15 +42,12 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         id="codeInput"
         tabIndex={0}
         autoComplete="off"
+        onKeyPress={handleKeyPress}
+        onKeyDown={(e) => e.key === "Backspace" && handleKeyPress(e)}
         autoFocus
-        onKeyDown={handleKeyDown}
       />
-      <div className="word-wrapper">
-        <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
-        {words.map((word, index) => (
-          <Word key={index} word={word + " "} typed={typed[index]} />
-        ))}
-      </div>
+      <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
+      <WordList next={typed}>{codeBlock}</WordList>
     </main>
   );
 };
