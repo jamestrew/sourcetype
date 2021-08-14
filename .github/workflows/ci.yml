@@ -11,7 +11,7 @@ jobs:
         with:
           node-version: 16.6.2
       - run: npm ci
-      - run: npm run test --passWithNoTests
+      - run: npm run test
       - uses: actionsx/prettier@v2
         with:
           args: --check .
