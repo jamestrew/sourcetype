@@ -6,10 +6,12 @@ function Header() {
         <p>A website to practise typing code</p>
       </div>
       <div className="flex items-end">
-        <p><a href="https://github.com/trewjames/sourcetype">GitHub</a></p>
+        <p>
+          <a href="https://github.com/trewjames/sourcetype">GitHub</a>
+        </p>
       </div>
     </header>
-  )
+  );
 }
 
 export default Header;

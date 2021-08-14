@@ -10,7 +10,7 @@ describe("CodeWrapper", () => {
   it("verify backspace letters", async () => {
     // cursorStart is somehow mutated if put below inputs?!?!!?
     const xPos = cursorStart.x + curXStep;
-    const yPos = cursorStart.y
+    const yPos = cursorStart.y;
     const codeInput = screen.getByTestId("codeInput");
     const cursor = screen.getByTestId("cursor");
     fireEvent.keyPress(codeInput, { key: "a", charCode: 65 });
@@ -24,8 +24,8 @@ describe("CodeWrapper", () => {
   });
 
   it("backspace at start", async () => {
-    const xPos = cursorStart.x
-    const yPos = cursorStart.y
+    const xPos = cursorStart.x;
+    const yPos = cursorStart.y;
     const codeInput = screen.getByTestId("codeInput");
     const cursor = screen.getByTestId("cursor");
     fireEvent.keyDown(codeInput, { key: "Backspace", charCode: 8 });

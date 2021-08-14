@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 * {
-  @apply font-mono antialiased
+  @apply font-mono antialiased;
 }
 
 #root {
@@ -14,7 +14,9 @@ body {
   @apply mx-0;
 }
 
-footer, header, main {
+footer,
+header,
+main {
   @apply max-w-7xl xl:w-screen mx-auto;
 }
 
