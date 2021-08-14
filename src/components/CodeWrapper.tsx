@@ -7,7 +7,6 @@ interface ICodeWrapper {
   codeBlock: string;
 }
 
-
 // TODO: this will have to be tweaked based on font size
 export const curXStep = 0.582;
 export const curYStep = 7.5;
@@ -15,11 +14,12 @@ export const cursorStart = { x: 0, y: 0.1875 };
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const [cursorPos, setCursorPos] = useState(cursorStart);
-
   const [typed, setTyped] = useState<string[]>([]);
+  console.log(`[${typed}] - len: ${typed.length}`)
 
   const getCursorMovement = (key: string) => {
     if (key === "Backspace") {
+      if (typed.length === 0) return cursorPos;
       cursorPos.x -= curXStep;
     } else {
       cursorPos.x += curXStep;
@@ -29,6 +29,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
+    setCursorPos(getCursorMovement(event.key));
 
     if (event.key === "Backspace") {
       typed.pop();
@@ -36,7 +37,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       typed.push(event.key);
     }
     setTyped([...typed]);
-    setCursorPos(getCursorMovement(event.key));
     console.log(typed.reduce((r, i) => r + i, ""));
   };
 

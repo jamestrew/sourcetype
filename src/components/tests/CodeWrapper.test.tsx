@@ -19,8 +19,8 @@ describe("CodeWrapper", () => {
     fireEvent.keyDown(codeInput, { key: "Backspace", charCode: 8 });
     fireEvent.keyPress(codeInput, { key: "c", charCode: 67 });
 
-    expect(cursor).toHaveStyle(`left: ${xPos}px`);
-    expect(cursor).toHaveStyle(`top: ${yPos}px`);
+    expect(cursor).toHaveStyle(`left: ${xPos}em`);
+    expect(cursor).toHaveStyle(`top: ${yPos}em`);
   });
 
   it("backspace at start", async () => {
@@ -31,7 +31,7 @@ describe("CodeWrapper", () => {
     fireEvent.keyDown(codeInput, { key: "Backspace", charCode: 8 });
     fireEvent.keyDown(codeInput, { key: "Backspace", charCode: 8 });
 
-    expect(cursor).toHaveStyle(`left: ${xPos}px`);
-    expect(cursor).toHaveStyle(`top: ${yPos}px`);
+    expect(cursor).toHaveStyle(`left: ${xPos}em`);
+    expect(cursor).toHaveStyle(`top: ${yPos}em`);
   });
 });
