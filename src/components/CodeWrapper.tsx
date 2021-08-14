@@ -26,6 +26,10 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
     return cursorPos;
   };
 
+  const getLastWord = () => {
+    return typed.reduce((r, i) => r + i, "").split(" ").splice(-1);
+  }
+
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     setCursorPos(getCursorMovement(event.key));
@@ -51,6 +55,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
           id="codeInput"
           data-testid="codeInput"
           tabIndex={0}
+          defaultValue={getLastWord()}
           autoComplete="off"
           onKeyPress={handleKeyPress}
           onKeyDown={(e) => e.key === "Backspace" && handleKeyPress(e)}
