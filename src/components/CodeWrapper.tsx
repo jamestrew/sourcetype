@@ -7,20 +7,23 @@ interface ICodeWrapper {
   codeBlock: string;
 }
 
-const cursorJump = 7.5; // TODO: this will have to be tweaked based on font size
+// TODO: this will have to be tweaked based on font size
+export const curXStep = 7.5;
+export const curYStep = 7.5;
+export const cursorStart = { x: 1, y: 25 };
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
-  const [cursorPos, setCursorPos] = useState({ x: 1, y: 25 });
+  const [cursorPos, setCursorPos] = useState(cursorStart);
   const [typed, setTyped] = useState<string[]>([]);
 
   const getCursorMovement = (key: string) => {
     if (key === "Backspace") {
-      cursorPos.x -= cursorJump;
+      cursorPos.x -= curXStep;
     } else {
-      cursorPos.x += cursorJump;
+      cursorPos.x += curXStep;
     }
     return cursorPos;
-  }
+  };
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -40,10 +43,11 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       <p>&laquo;main content&raquo;</p>
       <input
         id="codeInput"
+        data-testid="codeInput"
         tabIndex={0}
         autoComplete="off"
-        onKeyPress={handleKeyPress}
         onKeyDown={(e) => e.key === "Backspace" && handleKeyPress(e)}
+        onKeyPress={handleKeyPress}
         autoFocus
       />
       <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
