@@ -15,7 +15,6 @@ export const cursorStart = { x: 0, y: 0.1875 };
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const [cursorPos, setCursorPos] = useState(cursorStart);
   const [typed, setTyped] = useState<string[]>([]);
-  console.log(`[${typed}] - len: ${typed.length}`)
 
   const getCursorMovement = (key: string) => {
     if (key === "Backspace") {
