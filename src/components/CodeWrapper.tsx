@@ -27,8 +27,11 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   };
 
   const getLastWord = () => {
-    return typed.reduce((r, i) => r + i, "").split(" ").splice(-1);
-  }
+    return typed
+      .reduce((r, i) => r + i, "")
+      .split(" ")
+      .splice(-1);
+  };
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
