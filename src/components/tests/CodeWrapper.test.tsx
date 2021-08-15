@@ -42,7 +42,7 @@ describe("CodeWrapper", () => {
 
 describe("smart splitting", () => {
   it("blank codeBlock", () => {
-    expect(smartSplit("")).toBeUndefined();
+    expect(smartSplit("")).toEqual([]);
   });
 
   it("one line basic sentence", () => {

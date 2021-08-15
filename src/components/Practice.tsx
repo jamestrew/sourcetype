@@ -1,9 +1,14 @@
 import { CodeWrapper } from "./CodeWrapper";
 
 function Practice() {
+  const code = `
+if (true) {
+  return 'foo'
+}
+  `;
   return (
     <main>
-      <CodeWrapper codeBlock="The quick brown fox jumped over the lazy dog" />
+      <CodeWrapper codeBlock={code} />
     </main>
   );
 }

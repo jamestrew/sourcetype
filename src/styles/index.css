@@ -60,7 +60,7 @@ input {
 }
 
 .WordList {
-  @apply flex flex-wrap text-2xl;
+  @apply text-2xl;
   font-variant: no-common-ligatures;
 }
 
