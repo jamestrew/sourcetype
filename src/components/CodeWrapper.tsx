@@ -176,32 +176,35 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
 /**
  * Tokenizes a formatted multi-line code block
  * @param {(string | null)} str - a code block
- * @returns {string[]} array of words and format strings
+ * @returns {string[][] | void} array of words and format strings per line
  */
-const smartSplit = (str: string | null): string[] => {
-  let words: string[] = [];
-  if (str == null) return words;
+const smartSplit = (str: string | null): string[][] | void => {
+  let words: string[][] = [];
+  if (str == null || str === "") return;
 
   str = str.trim();
 
   let word = "";
+  let line = [];
   for (let i = 0; i <= str.length; i++) {
     if (str[i] === " " || i === str.length) {
       if (str[i + 1] === " ") {
-        if (word) words.push(word);
-        word = "&#x9;"; // https://www.compart.com/en/unicode/U+0009
+        if (word) line.push(word);
+        word = tab;
         i++;
       }
-      words.push(word);
+      line.push(word);
       word = "";
     } else if (str[i] === "\n") {
-      words.push(word);
-      words.push("&#xA;"); // https://www.compart.com/en/unicode/U+000A
+      line.push(word);
+      words.push(line);
+      line = [];
       word = "";
     } else {
       word += str[i];
     }
   }
+  words.push(line);
   return words;
 };
 
@@ -210,4 +213,5 @@ export const testing = {
   curYStep,
   cursorStart,
   smartSplit,
+  tab,
 };
