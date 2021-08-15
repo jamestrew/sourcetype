@@ -1,5 +1,4 @@
 import { KeyboardEvent, FC, useState } from "react";
-// import { invalidInputs } from "../utils/input";
 import { Cursor } from "./Cursor";
 import { WordList } from "components/WordList";
 
@@ -7,10 +6,9 @@ interface ICodeWrapper {
   codeBlock: string;
 }
 
-// TODO: this will have to be tweaked based on font size
-export const curXStep = 0.582;
-export const curYStep = 7.5;
-export const cursorStart = { x: 0, y: 0.1875 };
+const curXStep = 0.582;
+const curYStep = 7.5;
+const cursorStart = { x: 0, y: 0.1875 };
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const [cursorPos, setCursorPos] = useState(cursorStart);
@@ -59,4 +57,38 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       </div>
     </>
   );
+};
+
+const smartSplit = (str: string | null): string[] => {
+  let words: string[] = [];
+  if (str == null) return words;
+
+  str = str.trim();
+
+  let word = "";
+  for (let i = 0; i <= str.length; i++) {
+    if (str[i] === " " || i === str.length) {
+      if (str[i + 1] === " ") {
+        if (word) words.push(word);
+        word = "&#x9;"; // https://www.compart.com/en/unicode/U+0009
+        i++;
+      }
+      words.push(word);
+      word = "";
+    } else if (str[i] === "\n") {
+      words.push(word);
+      words.push("&#xA;"); // https://www.compart.com/en/unicode/U+000A
+      word = "";
+    } else {
+      word += str[i];
+    }
+  }
+  return words;
+};
+
+export const testing = {
+  curXStep,
+  curYStep,
+  cursorStart,
+  smartSplit,
 };
