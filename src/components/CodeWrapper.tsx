@@ -6,13 +6,13 @@ interface ICodeWrapper {
   codeBlock: string;
 }
 
-interface IWordListElement {
+type WordListElement = {
   currentWordId: number;
   current: {
     wordId: number;
     letter: string;
   }[];
-}
+};
 
 const curXStep = 0.582;
 const curYStep = 7.5;
@@ -20,7 +20,7 @@ const cursorStart = { x: 0, y: 0.1875 };
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const [cursorPos, setCursorPos] = useState(cursorStart);
-  const [typed, setTyped] = useState<IWordListElement>({
+  const [typed, setTyped] = useState<WordListElement>({
     currentWordId: 0,
     current: [],
   });
@@ -54,11 +54,11 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   /**
    * Gets a new typed state when input is received
    * @param {string} key - keypress char
-   * @returns {IWordListElement} the current typed state
+   * @returns {WordListElement} the current typed state
    */
-  const getNextTyped = (key: string): IWordListElement => {
+  const getNextTyped = (key: string): WordListElement => {
     /**
-     * Gets the IWordListElement.wordId for the given event.key
+     * Gets the WordListElement.wordId for the given event.key
      * @inner
      * @default {number} 0
      * @returns {number} the next wordId
@@ -88,10 +88,10 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   /**
    * Splices a word with the given wordId by bisecting the typed state
    * @param {number} wordId - id of the word to splice out
-   * @returns {IWordListElement["current"]} word with id of wordId
+   * @returns {WordListElement["current"]} word with id of wordId
    */
-  const bisectWord = (wordId: number): IWordListElement["current"] => {
-    let result: IWordListElement["current"] = [];
+  const bisectWord = (wordId: number): WordListElement["current"] => {
+    let result: WordListElement["current"] = [];
     let [lo, hi] = [wordId, typed.current.length];
 
     // wordId must be positive
@@ -120,24 +120,24 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
    * @param {number} wordId - id of the word to check if complete
    * @returns {boolean} true if complete; otherwise, false
    */
-  const isWordComplete = (wordId: number) => {
+  const isWordComplete = (wordId: number): boolean => {
     return wordId < typed.currentWordId;
   };
 
   /**
    * Gets the current word being typed
-   * @returns {IWordListElement["current"]} the last word
+   * @returns {WordListElement["current"]} the last word
    */
-  const getLastWord = () => {
+  const getLastWord = (): WordListElement["current"] => {
     return bisectWord(typed.currentWordId);
   };
 
   /**
    * Gets the string literal of a given input state
-   * @param {IWordListElement["current"]} input - a typed state
+   * @param {WordListElement["current"]} input - a typed state
    * @returns {string} the given state
    */
-  const getBareElements = (input: IWordListElement["current"]) => {
+  const getBareElements = (input: WordListElement["current"]): string => {
     return input.map((i) => i.letter).reduce((r, i) => r + i, "");
   };
 

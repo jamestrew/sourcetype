@@ -23,6 +23,7 @@ describe("CodeWrapper", () => {
 
     expect(cursor).toHaveStyle(`left: ${xPos}em`);
     expect(cursor).toHaveStyle(`top: ${yPos}em`);
+    expect(codeInput).toHaveValue("c");
   });
 
   it("backspace at start", async () => {
@@ -35,6 +36,7 @@ describe("CodeWrapper", () => {
 
     expect(cursor).toHaveStyle(`left: ${xPos}em`);
     expect(cursor).toHaveStyle(`top: ${yPos}em`);
+    expect(codeInput).toHaveValue("");
   });
 });
 
