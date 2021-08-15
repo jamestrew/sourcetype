@@ -1,6 +1,8 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import { CodeWrapper, curXStep, cursorStart } from "components/CodeWrapper";
+import { CodeWrapper } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
+import { testing } from "../CodeWrapper";
+const { smartSplit, curXStep, cursorStart } = testing;
 
 describe("CodeWrapper", () => {
   beforeEach(() => {
@@ -33,5 +35,85 @@ describe("CodeWrapper", () => {
 
     expect(cursor).toHaveStyle(`left: ${xPos}em`);
     expect(cursor).toHaveStyle(`top: ${yPos}em`);
+  });
+});
+
+describe("smart splitting", () => {
+  it("blank codeBlock", () => {
+    expect(smartSplit("")).toEqual([""]);
+  });
+
+  it("one line basic sentence", () => {
+    const str = "this app is sick";
+    const result = ["this", "app", "is", "sick"];
+    expect(smartSplit(str)).toEqual(result);
+  });
+
+  it("poorly spaced one line basic sentence", () => {
+    const str = " this app is sick ";
+    const result = ["this", "app", "is", "sick"];
+    expect(smartSplit(str)).toEqual(result);
+  });
+
+  it("one line sentence with tabs", () => {
+    const tab = "&#x9;";
+    const str = "these  are  tab  spaced";
+    const result = ["these", tab, "are", tab, "tab", tab, "spaced"];
+    expect(smartSplit(str)).toEqual(result);
+  });
+
+  it("simply multiline", () => {
+    const cr = "&#xA;";
+    const str = `these
+are
+lines`;
+    const result = ["these", cr, "are", cr, "lines"];
+    expect(smartSplit(str)).toEqual(result);
+  });
+
+  it("codeblock: basic if", () => {
+    const cr = "&#xA;";
+    const tab = "&#x9;";
+    const str = `if (true) {
+  const foo = 'bar'
+}`;
+    const result = [
+      "if",
+      "(true)",
+      "{",
+      cr,
+      tab,
+      "const",
+      "foo",
+      "=",
+      "'bar'",
+      cr,
+      "}",
+    ];
+    expect(smartSplit(str)).toEqual(result);
+  });
+
+  it("codeblock: basic if", () => {
+    const cr = "&#xA;";
+    const tab = "&#x9;";
+    const str = `def func:
+  if foo:
+    return True
+
+`;
+    const result = [
+      "def",
+      "func:",
+      cr,
+      tab,
+      "if",
+      "foo:",
+      cr,
+      tab,
+      tab,
+      "return",
+      "True",
+    ];
+    expect(smartSplit(str)).toEqual(result);
   });
 });
