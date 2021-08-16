@@ -1,6 +1,7 @@
 import { KeyboardEvent, FC, useState } from "react";
 import { Cursor } from "./Cursor";
 import { Word } from "components/Word";
+import { Tab } from "./Tab";
 
 interface ICodeWrapper {
   codeBlock: string;
@@ -18,7 +19,11 @@ const curXStep = 0.582;
 const curYStep = 7.5;
 const cursorStart = { x: 0, y: 0.1875 };
 
+const tab = "&#x9;"; // https://www.compart.com/en/unicode/U+0009
+
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
+  let wordIdx = 0;
+  const wordList = smartSplit(codeBlock);
   const [cursorPos, setCursorPos] = useState(cursorStart);
   const [typed, setTyped] = useState<WordListElement>({
     currentWordId: 0,
@@ -145,16 +150,29 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
     <>
       <div className="CodeWrapper">
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
-        <div className="WordList">
-          {codeBlock.split(" ").map((wd, i) => (
-            <Word
-              key={i}
-              text={wd}
-              value={getBareElements(bisectWord(i)).split("")}
-              isComplete={isWordComplete(i)}
-            />
-          ))}
-        </div>
+        {wordList.map((line, lineNum) => {
+          return (
+            <div className="flex flex-wrap" key={lineNum}>
+              {line.map((wd, wdNum) => {
+                if (wd === tab)
+                  return (
+                    <Tab key={`${lineNum}:${wdNum}`} spaceSize={curXStep} />
+                  );
+                const i = wordIdx;
+                wordIdx++;
+                return (
+                  <Word
+                    key={i}
+                    text={wd}
+                    value={getBareElements(bisectWord(i)).split("")}
+                    isComplete={isWordComplete(i)}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
+        <div className="WordList"></div>
       </div>
       <div className="grid justify-items-center py-2">
         <p>&laquo;main content&raquo;</p>
@@ -176,32 +194,35 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
 /**
  * Tokenizes a formatted multi-line code block
  * @param {(string | null)} str - a code block
- * @returns {string[]} array of words and format strings
+ * @returns {string[][]} array of words and format strings per line
  */
-const smartSplit = (str: string | null): string[] => {
-  let words: string[] = [];
-  if (str == null) return words;
+const smartSplit = (str: string | null): string[][] => {
+  let words: string[][] = [];
+  if (str == null || str === "") return words;
 
   str = str.trim();
 
   let word = "";
+  let line = [];
   for (let i = 0; i <= str.length; i++) {
     if (str[i] === " " || i === str.length) {
       if (str[i + 1] === " ") {
-        if (word) words.push(word);
-        word = "&#x9;"; // https://www.compart.com/en/unicode/U+0009
+        if (word) line.push(word);
+        word = tab;
         i++;
       }
-      words.push(word);
+      line.push(word);
       word = "";
     } else if (str[i] === "\n") {
-      words.push(word);
-      words.push("&#xA;"); // https://www.compart.com/en/unicode/U+000A
+      line.push(word);
+      words.push(line);
+      line = [];
       word = "";
     } else {
       word += str[i];
     }
   }
+  words.push(line);
   return words;
 };
 
@@ -210,4 +231,5 @@ export const testing = {
   curYStep,
   cursorStart,
   smartSplit,
+  tab,
 };

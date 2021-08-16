@@ -7,17 +7,17 @@ interface IWord {
   isComplete?: boolean;
 }
 
-interface IWordElement {
+type WordElement = {
   index: number;
   char: string;
   isHit?: boolean;
-}
+};
 
 const Word: React.FC<IWord> = ({ text, value, isComplete }) => {
   const originWord = text.split("");
 
   const createWord = () => {
-    let spreadTyped: IWordElement[] = [];
+    let spreadTyped: WordElement[] = [];
 
     if (value) {
       spreadTyped = [
