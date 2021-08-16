@@ -15,7 +15,7 @@ export const ThemeProvider: FC = ({ children }) => {
       <div className="grid justify-items-center">
         <button
           onClick={() => {
-            theme == `light` ? setTheme(`dark`) : setTheme(`light`);
+            theme === `light` ? setTheme(`dark`) : setTheme(`light`);
           }}
         >
           Theme: {theme}
