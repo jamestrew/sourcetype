@@ -21,6 +21,8 @@ const cursorStart = { x: 0, y: 0.1875 };
 
 const tab = "&#x9;"; // https://www.compart.com/en/unicode/U+0009
 
+const overflow_limit = 10;
+
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   let wordIdx = 0;
   const wordList = smartSplit(codeBlock);
@@ -81,10 +83,16 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
       // Append the next letter from the event.key
       let nextId = getNextId();
       if (key === " ") nextId += 1;
-      typed.current.push({
-        wordId: nextId,
-        letter: key,
-      });
+      if (
+        nextId !== typed.currentWordId ||
+        getLastWord().length - overflow_limit <
+          codeBlock.trim().split(/[\n ]/)[typed.currentWordId].length
+      ) {
+        typed.current.push({
+          wordId: nextId,
+          letter: key,
+        });
+      }
       typed.currentWordId = nextId;
     }
     return { ...typed };
@@ -117,7 +125,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         result.push(typed.current[i]);
       } else break;
     }
-    return result.filter((i) => i.letter !== " ");
+    return result.filter((i) => i.letter !== " " && i.letter !== "\n");
   };
 
   /**

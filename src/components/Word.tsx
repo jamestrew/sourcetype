@@ -46,7 +46,11 @@ const Word: React.FC<IWord> = ({ text, value, isComplete }) => {
   return (
     <div className="Word">
       {createWord().map((ch, i) => (
-        <Letter key={i} letter={ch.char} state={getState(ch.isHit)} />
+        <Letter
+          key={i}
+          letter={ch.char}
+          state={i >= text.length ? LetterState.overflow : getState(ch.isHit)}
+        />
       ))}
     </div>
   );
