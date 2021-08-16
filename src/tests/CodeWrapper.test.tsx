@@ -1,7 +1,6 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import { CodeWrapper } from "components/CodeWrapper";
+import { CodeWrapper, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
-import { testing } from "../CodeWrapper";
 const { smartSplit, curXStep, cursorStart, tab } = testing;
 
 describe("CodeWrapper", () => {
