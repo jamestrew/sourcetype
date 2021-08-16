@@ -1,9 +1,9 @@
 import { FC } from "react";
 
 export const LetterState = {
-  untyped: "text-gray-500",
-  correct: "text-black",
-  incorrect: "text-red-500",
+  untyped: "text-gray-500 dark:text-gray-300",
+  correct: "text-black dark:text-yellow-200",
+  incorrect: "text-red-500 dark:text-red-500",
   overflow: "text-red-800",
 };
 
