@@ -217,27 +217,18 @@ describe("getNextTyped", () => {
       " ",
       {
         currentWordId: 0,
-        current: [
-          { wordId: 0, letter: "f" },
-          { wordId: 0, letter: "o" },
-          { wordId: 0, letter: "o" },
-        ],
+        current: [],
       },
       codeBlockSimple
     );
     const result = {
       currentWordId: 1,
-      current: [
-        { wordId: 0, letter: "f" },
-        { wordId: 0, letter: "o" },
-        { wordId: 0, letter: "o" },
-        { wordId: 1, letter: " " },
-      ],
+      current: [{ wordId: 1, letter: " " }],
     };
     expect(next).toEqual(result);
   });
 
-  it("overflow limiter", () => {
+  it("overflow limiter simple", () => {
     const overflow_limit = 10;
     const result: Typed = {
       currentWordId: 0,
@@ -257,6 +248,30 @@ describe("getNextTyped", () => {
     next = getNextTyped("o", next, codeBlockSimple);
     for (let i = 0; i < overflow_limit + 3; ++i) {
       next = getNextTyped("o", next, codeBlockSimple);
+    }
+    expect(next).toEqual(result);
+  });
+
+  it("overflow limiter newline", () => {
+    const overflow_limit = 10;
+    const result: Typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+        ...Array(overflow_limit).fill({ wordId: 0, letter: "o" }),
+      ],
+    };
+    let next: Typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    next = getNextTyped("f", next, "\nfoo\n");
+    next = getNextTyped("o", next, "\nfoo\n");
+    next = getNextTyped("o", next, "\nfoo\n");
+    for (let i = 0; i < overflow_limit + 3; ++i) {
+      next = getNextTyped("o", next, "\nfoo\n");
     }
     expect(next).toEqual(result);
   });
