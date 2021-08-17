@@ -1,7 +1,15 @@
 import { render, fireEvent, screen } from "@testing-library/react";
 import { CodeWrapper, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
-const { smartSplit, curXStep, cursorStart, tab } = testing;
+const {
+  smartSplit,
+  curXStep,
+  cursorStart,
+  tab,
+  getCursorMovement,
+  getNextTyped,
+  bisectWord,
+} = testing;
 
 describe("CodeWrapper", () => {
   beforeEach(() => {
@@ -39,6 +47,9 @@ describe("CodeWrapper", () => {
   });
 });
 
+/**
+ * smartSplit
+ */
 describe("smart splitting", () => {
   it("blank codeBlock", () => {
     expect(smartSplit("")).toEqual([]);
@@ -95,4 +106,80 @@ lines`;
     ];
     expect(smartSplit(str)).toEqual(result);
   });
+});
+
+/**
+ * getCursorMovement
+ */
+describe("getCursorMovement", () => {
+  it("backspace on start", () => {
+    const typedStart = { currentWordId: 0, current: [] };
+    const result = getCursorMovement("Backspace", typedStart, cursorStart);
+    expect(result).toEqual(cursorStart);
+  });
+
+  it("enter letter at start", () => {
+    const typedStart = { currentWordId: 0, current: [] };
+    const expected = { x: cursorStart.x + curXStep, y: cursorStart.y };
+    const result = getCursorMovement("r", typedStart, cursorStart);
+    expect(result).toEqual(expected);
+  });
+
+  it("delete letter", () => {
+    const typedStart = {
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "i" }],
+    };
+    const curCurrent = { x: cursorStart.x + curXStep, y: cursorStart.y };
+    const result = getCursorMovement("Backspace", typedStart, curCurrent);
+    expect(result.x).toBeCloseTo(cursorStart.x);
+    expect(result.y).toBeCloseTo(cursorStart.y);
+  });
+
+  it.todo("space mid word jump to next word");
+  it.todo("New line - no indentation");
+  it.todo("New line - autoindent");
+});
+
+/**
+ * getNextTyped
+ */
+describe("getNextTyped", () => {
+  const codeBlockSimple = "foo bar baz";
+  const typedStart = { currentWordId: 0, current: [] };
+
+  it("backspace on start", () => {
+    const result = getNextTyped("Backspace", typedStart, codeBlockSimple);
+    expect(result).toEqual(typedStart);
+  });
+
+  it("enter letter at start", () => {
+    const result = getNextTyped("a", typedStart, codeBlockSimple);
+    const expected = {
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "a" }],
+    };
+    expect(result).toEqual(expected);
+  });
+
+  it("delete letter", () => {
+    const currentTyped = {
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "a" }],
+    };
+    const result = getNextTyped("Backspace", currentTyped, codeBlockSimple);
+    expect(result).toEqual({ currentWordId: 0, current: [] });
+  });
+
+  it.todo("space mid word");
+  it.todo("newline");
+});
+
+/**
+ * bisectWord
+ */
+describe("bisectWord", () => {
+  const typedStart = { currentWordId: 0, current: [] };
+
+  it.todo("empty");
 });

@@ -129,7 +129,7 @@ const smartSplit = (str: string | null): string[][] => {
 /**
  * Gets a new cursorPos state when input is received
  * @param {string} key - keypress char
- * @param {Typed} typed - typing progress data
+ * @param {Typed} typed - current typed state
  * @param {CursorPos} cursorPos - current cursor position
  * @returns {{ x: number, y: number }}
  */
@@ -137,7 +137,7 @@ const getCursorMovement = (
   key: string,
   typed: Typed,
   cursorPos: CursorPos
-): { x: number; y: number } => {
+): CursorPos => {
   if (key === "Backspace") {
     if (typed.current.length === 0) return cursorPos;
     cursorPos.x -= curXStep;
@@ -150,6 +150,8 @@ const getCursorMovement = (
 /**
  * Gets a new typed state when input is received
  * @param {string} key - keypress char
+ * @param {Typed} typed - current typed state
+ * @param {string} codeBlock - code block to be typed
  * @returns {Typed} the current typed state
  */
 const getNextTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
@@ -190,6 +192,7 @@ const getNextTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
 /**
  * Splices a word with the given wordId by bisecting the typed state
  * @param {number} wordId - id of the word to splice out
+ * @param {Typed} typed - current typed state
  * @returns {Typed["current"]} word with id of wordId
  */
 const bisectWord = (wordId: number, typed: Typed): Typed["current"] => {
@@ -220,6 +223,7 @@ const bisectWord = (wordId: number, typed: Typed): Typed["current"] => {
 /**
  * Checks if a word with the given wordId has been passed in the current state
  * @param {number} wordId - id of the word to check if complete
+ * @param {Typed} typed - current typed state
  * @returns {boolean} true if complete; otherwise, false
  */
 const isWordComplete = (wordId: number, typed: Typed): boolean => {
@@ -249,4 +253,10 @@ export const testing = {
   cursorStart,
   smartSplit,
   tab,
+  getCursorMovement,
+  getNextTyped,
+  bisectWord,
+  isWordComplete,
+  getLastWord,
+  getBareElements,
 };
