@@ -7,7 +7,7 @@ interface ICodeWrapper {
   codeBlock: string;
 }
 
-type Typed = {
+export type Typed = {
   currentWordId: number;
   current: {
     wordId: number;

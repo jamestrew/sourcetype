@@ -1,5 +1,5 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import { CodeWrapper, testing } from "components/CodeWrapper";
+import { CodeWrapper, Typed, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
 const {
   smartSplit,
@@ -146,32 +146,121 @@ describe("getCursorMovement", () => {
  */
 describe("getNextTyped", () => {
   const codeBlockSimple = "foo bar baz";
-  const typedStart = { currentWordId: 0, current: [] };
+  const typedStart: Typed = {
+    currentWordId: 0,
+    current: [],
+  };
 
   it("backspace on start", () => {
-    const result = getNextTyped("Backspace", typedStart, codeBlockSimple);
-    expect(result).toEqual(typedStart);
+    const next = getNextTyped(
+      "Backspace",
+      { currentWordId: 0, current: [] },
+      codeBlockSimple
+    );
+    expect(next).toEqual(typedStart);
   });
 
-  it("enter letter at start", () => {
-    const result = getNextTyped("a", typedStart, codeBlockSimple);
-    const expected = {
+  it("single letter from start", () => {
+    const next = getNextTyped(
+      "a",
+      { currentWordId: 0, current: [] },
+      codeBlockSimple
+    );
+    const result = {
       currentWordId: 0,
       current: [{ wordId: 0, letter: "a" }],
     };
-    expect(result).toEqual(expected);
+    expect(next).toEqual(result);
   });
 
-  it("delete letter", () => {
-    const currentTyped = {
+  it("backspace on letter", () => {
+    const next = getNextTyped(
+      "Backspace",
+      {
+        currentWordId: 0,
+        current: [
+          { wordId: 0, letter: "i" },
+          { wordId: 0, letter: "n" },
+          { wordId: 0, letter: "t" },
+        ],
+      },
+      codeBlockSimple
+    );
+    const result = {
       currentWordId: 0,
-      current: [{ wordId: 0, letter: "a" }],
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "n" },
+      ],
     };
-    const result = getNextTyped("Backspace", currentTyped, codeBlockSimple);
-    expect(result).toEqual({ currentWordId: 0, current: [] });
+    expect(next).toEqual(result);
   });
 
-  it.todo("space mid word");
+  it("consecutive identical letters", () => {
+    const result = {
+      currentWordId: 0,
+      current: Array(9).fill({ wordId: 0, letter: "o" }),
+    };
+    let next: Typed = {
+      currentWordId: 0,
+      current: [],
+    };
+
+    for (let i = 0; i < 9; ++i) {
+      next = getNextTyped("o", next, codeBlockSimple);
+    }
+    expect(next).toEqual(result);
+  });
+
+  it("space increments wordId", () => {
+    const next = getNextTyped(
+      " ",
+      {
+        currentWordId: 0,
+        current: [
+          { wordId: 0, letter: "f" },
+          { wordId: 0, letter: "o" },
+          { wordId: 0, letter: "o" },
+        ],
+      },
+      codeBlockSimple
+    );
+    const result = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    expect(next).toEqual(result);
+  });
+
+  it("overflow limiter", () => {
+    const overflow_limit = 10;
+    const result: Typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+        ...Array(overflow_limit).fill({ wordId: 0, letter: "o" }),
+      ],
+    };
+    let next: Typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    next = getNextTyped("f", next, codeBlockSimple);
+    next = getNextTyped("o", next, codeBlockSimple);
+    next = getNextTyped("o", next, codeBlockSimple);
+    for (let i = 0; i < overflow_limit + 3; ++i) {
+      next = getNextTyped("o", next, codeBlockSimple);
+    }
+    expect(next).toEqual(result);
+  });
+
   it.todo("newline");
 });
 
