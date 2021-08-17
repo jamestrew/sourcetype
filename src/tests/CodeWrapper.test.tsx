@@ -9,6 +9,7 @@ const {
   getCursorMovement,
   getNextTyped,
   bisectWord,
+  isWordComplete,
 } = testing;
 
 describe("CodeWrapper", () => {
@@ -316,5 +317,26 @@ describe("bisectWord", () => {
     };
     const word = bisectWord(1, next);
     expect(word).toEqual([{ wordId: 1, letter: "b" }]);
+  });
+});
+
+/**
+ * isWordComplete
+ */
+describe("isWordComplete", () => {
+  it("word is complete", () => {
+    const next = {
+      currentWordId: 1,
+      current: [{ wordId: 1, letter: " " }],
+    };
+    expect(isWordComplete(0, next)).toEqual(true);
+  });
+
+  it("word is incomplete", () => {
+    const next = {
+      currentWordId: 1,
+      current: [{ wordId: 1, letter: " " }],
+    };
+    expect(isWordComplete(1, next)).toEqual(false);
   });
 });
