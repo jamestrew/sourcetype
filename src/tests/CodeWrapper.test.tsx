@@ -285,5 +285,36 @@ describe("getNextTyped", () => {
 describe("bisectWord", () => {
   const typedStart = { currentWordId: 0, current: [] };
 
-  it.todo("empty");
+  it("initial state", () => {
+    const next = {
+      currentWordId: 0,
+      current: [],
+    };
+    const word = bisectWord(0, next);
+    expect(word).toEqual([]);
+  });
+
+  it("fetch out-of-range wordId", () => {
+    const next = {
+      currentWordId: 0,
+      current: [],
+    };
+    expect(bisectWord(-1, next)).toEqual([]);
+    expect(bisectWord(1, next)).toEqual([]);
+  });
+
+  it("middle fetch", () => {
+    const next = {
+      currentWordId: 2,
+      current: [
+        { wordId: 0, letter: "a" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "b" },
+        { wordId: 2, letter: " " },
+        { wordId: 2, letter: "c" },
+      ],
+    };
+    const word = bisectWord(1, next);
+    expect(word).toEqual([{ wordId: 1, letter: "b" }]);
+  });
 });
