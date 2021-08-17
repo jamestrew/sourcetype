@@ -4,7 +4,7 @@ export const LetterState = {
   untyped: "text-gray-500 dark:text-gray-300",
   correct: "text-black dark:text-yellow-200",
   incorrect: "text-red-500 dark:text-red-500",
-  overflow: "text-red-800",
+  overflow: "text-red-800 dark:text-red-300",
 };
 
 interface ILetter {
