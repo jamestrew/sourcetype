@@ -11,6 +11,7 @@ const {
   bisectWord,
   isWordComplete,
   getLastWord,
+  getBareElements,
 } = testing;
 
 describe("CodeWrapper", () => {
@@ -372,5 +373,34 @@ describe("getLastWord", () => {
       { wordId: 1, letter: "o" },
     ];
     expect(getLastWord(next)).toEqual(result);
+  });
+});
+
+/**
+ * getBareElements
+ */
+describe("getBareElements", () => {
+  it("initial state", () => {
+    const next = {
+      currentWordId: 0,
+      current: [],
+    };
+    expect(getBareElements(next.current)).toEqual("");
+  });
+
+  it("reduction of entire state", () => {
+    const next = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "b" },
+        { wordId: 1, letter: "a" },
+        { wordId: 1, letter: "r" },
+      ],
+    };
+    expect(getBareElements(next.current)).toEqual("foo bar");
   });
 });
