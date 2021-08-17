@@ -277,7 +277,9 @@ describe("getNextTyped", () => {
     expect(next).toEqual(result);
   });
 
-  it.todo("newline");
+  it.todo("enter on start");
+  it.todo("enter skips multiple words");
+  it.todo("enter at end-of-line");
 });
 
 /**
