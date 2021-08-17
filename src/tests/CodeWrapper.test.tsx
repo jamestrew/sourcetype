@@ -10,6 +10,7 @@ const {
   getNextTyped,
   bisectWord,
   isWordComplete,
+  getLastWord,
 } = testing;
 
 describe("CodeWrapper", () => {
@@ -340,5 +341,36 @@ describe("isWordComplete", () => {
       current: [{ wordId: 1, letter: " " }],
     };
     expect(isWordComplete(1, next)).toEqual(false);
+  });
+});
+
+/**
+ * getLastWord
+ */
+describe("getLastWord", () => {
+  it("initial state", () => {
+    const next = {
+      currentWordId: 0,
+      current: [],
+    };
+    expect(getLastWord(next)).toEqual([]);
+  });
+
+  it("last word extracted", () => {
+    const next = {
+      currentWordId: 1,
+      current: [
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "f" },
+        { wordId: 1, letter: "o" },
+        { wordId: 1, letter: "o" },
+      ],
+    };
+    const result = [
+      { wordId: 1, letter: "f" },
+      { wordId: 1, letter: "o" },
+      { wordId: 1, letter: "o" },
+    ];
+    expect(getLastWord(next)).toEqual(result);
   });
 });
