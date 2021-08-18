@@ -1,4 +1,4 @@
-import { KeyboardEvent, FC, useState } from "react";
+import { KeyboardEvent, FC, useState, useRef } from "react";
 import { Cursor } from "./Cursor";
 import { Word } from "components/Word";
 import { Tab } from "./Tab";
@@ -34,6 +34,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
     currentWordId: 0,
     current: [],
   });
+  const focusInput = useRef<HTMLInputElement>(null);
 
   /**
    * Updates the state of CodeWrapper onKeyPress
@@ -46,9 +47,15 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
     setTyped(getNextTyped(event.key, typed, codeBlock));
   };
 
+  const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (!focusInput || !focusInput.current) return;
+    focusInput.current.focus();
+  };
+
   return (
     <>
-      <div className="CodeWrapper">
+      <div className="CodeWrapper" onClick={handleClickToFocus}>
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
         {wordList.map((line, lineNum) => {
           return (
@@ -79,6 +86,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         <input
           id="codeInput"
           data-testid="codeInput"
+          ref={focusInput}
           tabIndex={0}
           defaultValue={getBareElements(getLastWord(typed))}
           autoComplete="off"
