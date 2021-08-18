@@ -35,6 +35,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
     current: [],
   });
   const focusInput = useRef<HTMLInputElement>(null);
+  const focusBlurElement = useRef<HTMLParagraphElement>(null);
 
   /**
    * Updates the state of CodeWrapper onKeyPress
@@ -51,6 +52,13 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
     event.preventDefault();
     if (!focusInput || !focusInput.current) return;
     focusInput.current.focus();
+  };
+
+  const handleFocusOut = (event: React.FocusEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    if (!focusBlurElement || !focusBlurElement.current) return;
+    focusBlurElement.current.hidden =
+      focusInput.current !== document.activeElement;
   };
 
   return (
@@ -82,7 +90,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         <div className="WordList"></div>
       </div>
       <div className="grid justify-items-center py-2">
-        <p>&laquo;main content&raquo;</p>
+        <p ref={focusBlurElement}>&laquo;main content&raquo;</p>
         <input
           id="codeInput"
           data-testid="codeInput"
@@ -92,6 +100,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
           autoComplete="off"
           onKeyPress={handleKeyPress}
           onKeyDown={(e) => e.key === "Backspace" && handleKeyPress(e)}
+          onBlur={handleFocusOut}
           autoFocus
         />
       </div>
