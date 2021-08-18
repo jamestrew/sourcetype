@@ -23,7 +23,7 @@ type CursorPos = {
 const curXStep = 0.582;
 const curYStep = 7.5;
 const cursorStart = { x: 0, y: 0.1875 };
-const tab = "&#x9;"; // https://www.compart.com/en/unicode/U+0009
+const tab = "&#x9;";
 const overflow_limit = 10;
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
@@ -131,7 +131,7 @@ const smartSplit = (str: string | null): string[][] => {
  * @param {string} key - keypress char
  * @param {Typed} typed - current typed state
  * @param {CursorPos} cursorPos - current cursor position
- * @returns {{ x: number, y: number }}
+ * @returns {CursorPos}
  */
 const getCursorMovement = (
   key: string,
@@ -158,7 +158,7 @@ const getNextTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
   /**
    * Gets the WordListElement.wordId for the given event.key
    * @inner
-   * @default {number} 0
+   * @default 0
    * @returns {number} the next wordId
    */
   const getNextId = (): number => {

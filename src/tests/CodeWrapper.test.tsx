@@ -96,7 +96,7 @@ lines`;
     expect(smartSplit(str)).toEqual(result);
   });
 
-  it("codeblock: basic if", () => {
+  it("codeblock: python func", () => {
     const str = `def func:
   if foo:
     return True
