@@ -49,7 +49,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
    */
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    setCursorPos(getCursorMovement(event.key, typed, cursorPos));
+    setCursorPos(getCursorMovement(event.key, typed, codeBlock, cursorPos));
     setTyped(getNextTyped(event.key, typed, codeBlock));
   };
 
@@ -86,7 +86,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
         {wordList.map((line, lineNum) => {
           return (
-            <div className="flex flex-wrap wordList" key={lineNum}>
+            <div className="flex flex-wrap WordList" key={lineNum}>
               {line.map((wd, wdNum) => {
                 if (wd === tab)
                   return (
@@ -160,23 +160,58 @@ const smartSplit = (str: string | null): string[][] => {
   return words;
 };
 
+const getCursorOffset = (typed: Typed, codeBlock: string) => {
+  return Math.max(
+    0,
+    codeBlock.trim().split(/[\n ]/)[typed.currentWordId].length -
+      getLastWord(typed).length
+  );
+};
+
 /**
  * Gets a new cursorPos state when input is received
  * @param {string} key - keypress char
  * @param {Typed} typed - current typed state
+ * @param {string} codeBlock - code block to be typed
  * @param {CursorPos} cursorPos - current cursor position
  * @returns {CursorPos}
  */
 const getCursorMovement = (
   key: string,
   typed: Typed,
+  codeBlock: string,
   cursorPos: CursorPos
 ): CursorPos => {
+  let offset = 0;
   if (key === "Backspace") {
+    // prevent cursor floating out of bounds
     if (typed.current.length === 0) return cursorPos;
-    cursorPos.x -= curXStep;
+    if (getLastWord(typed).length === 0) {
+      // user is correcting previous word
+      const next = {
+        currentWordId: typed.currentWordId - 1,
+        current: typed.current,
+      };
+      offset = getCursorOffset(next, codeBlock) + 1;
+    }
+    cursorPos.x -= offset === 0 ? curXStep : offset * curXStep;
   } else {
-    cursorPos.x += curXStep;
+    let isOverflow = false;
+    if (key === " ") {
+      // check for skipped letters
+      offset = getCursorOffset(typed, codeBlock) + 1;
+    } else if (
+      getLastWord(typed).length - overflow_limit >=
+      codeBlock.trim().split(/[\n ]/)[typed.currentWordId].length
+    ) {
+      // prevent cursor floating past words
+      isOverflow = true;
+    }
+    if (offset === 0) {
+      cursorPos.x += isOverflow ? 0 : curXStep;
+    } else {
+      cursorPos.x += curXStep * offset;
+    }
   }
   return cursorPos;
 };

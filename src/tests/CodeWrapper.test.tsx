@@ -108,16 +108,28 @@ lines`;
  * getCursorMovement
  */
 describe("getCursorMovement", () => {
+  const codeBlockSimple = "foo bar baz";
+
   it("backspace on start", () => {
     const typedStart = { currentWordId: 0, current: [] };
-    const result = getCursorMovement("Backspace", typedStart, cursorStart);
+    const result = getCursorMovement(
+      "Backspace",
+      typedStart,
+      codeBlockSimple,
+      cursorStart
+    );
     expect(result).toEqual(cursorStart);
   });
 
   it("enter letter at start", () => {
     const typedStart = { currentWordId: 0, current: [] };
     const expected = { x: cursorStart.x + curXStep, y: cursorStart.y };
-    const result = getCursorMovement("r", typedStart, cursorStart);
+    const result = getCursorMovement(
+      "r",
+      typedStart,
+      codeBlockSimple,
+      cursorStart
+    );
     expect(result).toEqual(expected);
   });
 
@@ -127,7 +139,12 @@ describe("getCursorMovement", () => {
       current: [{ wordId: 0, letter: "i" }],
     };
     const curCurrent = { x: cursorStart.x + curXStep, y: cursorStart.y };
-    const result = getCursorMovement("Backspace", typedStart, curCurrent);
+    const result = getCursorMovement(
+      "Backspace",
+      typedStart,
+      codeBlockSimple,
+      curCurrent
+    );
     expect(result.x).toBeCloseTo(cursorStart.x);
     expect(result.y).toBeCloseTo(cursorStart.y);
   });
