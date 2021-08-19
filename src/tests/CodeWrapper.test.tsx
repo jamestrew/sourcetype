@@ -1,4 +1,4 @@
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CodeWrapper, Typed, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
@@ -18,6 +18,12 @@ const {
 describe("CodeWrapper", () => {
   beforeEach(() => {
     render(<CodeWrapper codeBlock="foo" />);
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   it("focus on codeWrapper", async () => {
@@ -37,9 +43,12 @@ describe("CodeWrapper", () => {
     const focusWarning = screen.getByTestId("focusWarning");
 
     userEvent.click(focusWarning);
-    expect(codeInput).not.toHaveFocus();
-    expect(focusWarning).not.toHaveClass("hidden");
-    expect(codeWrapper).toHaveClass("blurred");
+    const timer = setTimeout(() => {
+      expect(codeInput).not.toHaveFocus();
+      expect(focusWarning).not.toHaveClass("hidden");
+      expect(codeWrapper).toHaveClass("blurred");
+    }, 1001);
+    clearTimeout(timer);
   });
 });
 
