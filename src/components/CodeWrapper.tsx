@@ -20,6 +20,9 @@ type CursorPos = {
   y: number;
 };
 
+type FocusWarning = "hidden" | "";
+type Blurred = "blurred" | "";
+
 const curXStep = 0.582;
 const curYStep = 7.5;
 const cursorStart = { x: 0, y: 0.1875 };
@@ -34,8 +37,10 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
     currentWordId: 0,
     current: [],
   });
-  const focusInput = useRef<HTMLInputElement>(null);
-  const focusBlurElement = useRef<HTMLParagraphElement>(null);
+  const focusInputRef = useRef<HTMLInputElement>(null);
+  const blurCodeRef = useRef<HTMLParagraphElement>(null);
+  const [focusWarning, setFocusWarning] = useState<FocusWarning>("hidden");
+  const [blurred, setBlurred] = useState<Blurred>("");
 
   /**
    * Updates the state of CodeWrapper onKeyPress
@@ -50,20 +55,34 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    if (!focusInput || !focusInput.current) return;
-    focusInput.current.focus();
+    if (!focusInputRef || !focusInputRef.current) return;
+    focusInputRef.current.focus();
+    setFocusWarning("hidden");
+    setBlurred("");
   };
 
   const handleFocusOut = (event: React.FocusEvent<HTMLInputElement>) => {
     event.preventDefault();
-    if (!focusBlurElement || !focusBlurElement.current) return;
-    focusBlurElement.current.hidden =
-      focusInput.current !== document.activeElement;
+    setFocusWarning("");
+    setBlurred("blurred");
   };
 
   return (
     <>
-      <div className="CodeWrapper" onClick={handleClickToFocus}>
+      <div
+        id="focusWarning"
+        data-testid="focusWarning"
+        className={focusWarning}
+      >
+        Click to focus
+      </div>
+      <div
+        id="codeWrapper"
+        data-testid="codeWrapper"
+        className={blurred}
+        onClick={handleClickToFocus}
+        ref={blurCodeRef}
+      >
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
         {wordList.map((line, lineNum) => {
           return (
@@ -90,11 +109,10 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         <div className="WordList"></div>
       </div>
       <div className="grid justify-items-center py-2">
-        <p ref={focusBlurElement}>&laquo;main content&raquo;</p>
         <input
           id="codeInput"
           data-testid="codeInput"
-          ref={focusInput}
+          ref={focusInputRef}
           tabIndex={0}
           defaultValue={getBareElements(getLastWord(typed))}
           autoComplete="off"

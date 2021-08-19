@@ -63,16 +63,16 @@ input {
   @apply rounded border-2 border-gray-400 outline-none h-10 w-80;
 }
 
-.CodeWrapper {
+#codeWrapper {
   @apply block relative;
-}
-
-.CodeWrapper > div {
   @apply w-full;
+  @apply inline-block;
 }
 
-.CodeWrapper div > p {
-  @apply inline-block;
+.blurred {
+  opacity: 0.25;
+  filter: blur(4px);
+  -webkit-filter: blur(4px);
 }
 
 .WordList {
@@ -108,12 +108,21 @@ input {
   }
 }
 
-/* TODO: appy these styles but need to make keep input focus on */
-/* #codeInput { */
-/*   height: 0; */
-/*   padding: 0; */
-/*   margin: 0; */
-/*   border: none; */
-/*   outline: none; */
-/*   display: block; */
-/* } */
+#codeInput {
+  height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  display: block;
+}
+
+#focusWarning {
+  text-align: center;
+  height: 0;
+  line-height: 150px;
+  z-index: 999;
+  position: relative;
+  user-select: none;
+  pointer-events: none;
+}
