@@ -63,8 +63,12 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
 
   const handleFocusOut = (event: React.FocusEvent<HTMLInputElement>) => {
     event.preventDefault();
-    setFocusWarning("");
-    setBlurred("blurred");
+    setTimeout(() => {
+      if (focusInputRef.current !== document.activeElement) {
+        setFocusWarning("");
+        setBlurred("blurred");
+      }
+    }, 1000);
   };
 
   return (
