@@ -70,6 +70,7 @@ input {
 }
 
 .blurred {
+  @apply transition duration-150 ease-in-out;
   opacity: 0.25;
   filter: blur(4px);
   -webkit-filter: blur(4px);
