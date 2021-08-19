@@ -1,4 +1,5 @@
 import { render, fireEvent, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { CodeWrapper, Typed, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
 const {
@@ -24,21 +25,18 @@ describe("CodeWrapper", () => {
     const codeInput = screen.getByTestId("codeInput");
     const focusWarning = screen.getByTestId("focusWarning");
 
-    fireEvent.click(codeWrapper);
+    userEvent.click(codeWrapper);
     expect(codeInput).toHaveFocus();
     expect(focusWarning).toHaveClass("hidden");
     expect(codeWrapper).not.toHaveClass("");
   });
 
-  // test still expects to have focus
-  // looks like the `not` is not being recognized?
-  // created an issue: https://github.com/testing-library/react-testing-library/issues/953
-  it.skip("focus away from codeWrapper", async () => {
+  it("focus away from codeWrapper", async () => {
     const codeWrapper = screen.getByTestId("codeWrapper");
     const codeInput = screen.getByTestId("codeInput");
     const focusWarning = screen.getByTestId("focusWarning");
 
-    fireEvent.click(codeInput);
+    userEvent.click(focusWarning);
     expect(codeInput).not.toHaveFocus();
     expect(focusWarning).not.toHaveClass("hidden");
     expect(codeWrapper).toHaveClass("blurred");

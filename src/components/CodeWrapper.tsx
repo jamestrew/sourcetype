@@ -106,7 +106,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
             </div>
           );
         })}
-        <div className="WordList"></div>
       </div>
       <div className="grid justify-items-center py-2">
         <input
