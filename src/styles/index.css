@@ -90,7 +90,7 @@ input {
 
 #cursor {
   @apply text-2xl m-1.5;
-  @apply absolute origin-top-left bg-black;
+  @apply absolute origin-top-left;
   height: 1em;
   width: 2px;
   animation-name: cursorFlash;
