@@ -160,7 +160,82 @@ describe("getCursorMovement", () => {
     expect(result.y).toBeCloseTo(cursorStart.y);
   });
 
-  it.todo("space mid word jump to next word");
+  it("cursor jump on skipped word", () => {
+    const typedStart = {
+      currentWordId: 0,
+      current: [],
+    };
+    const currCursor = { x: cursorStart.x, y: cursorStart.y };
+    const result = getCursorMovement(
+      " ",
+      typedStart,
+      codeBlockSimple,
+      currCursor
+    );
+    const skippedWord = codeBlockSimple.split(" ")[0];
+
+    expect(result.x).toBeCloseTo(
+      cursorStart.x + (skippedWord.length + 1) * curXStep
+    );
+  });
+
+  it("cursor jump on n-th skipped word", () => {
+    const typedStart = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    const currCursor = {
+      x: cursorStart.x + curXStep * typedStart.current.length,
+      y: cursorStart.y,
+    };
+    const result = getCursorMovement(
+      " ",
+      typedStart,
+      codeBlockSimple,
+      currCursor
+    );
+    const skippedWord = codeBlockSimple.split(" ")[1];
+
+    expect(result.x).toBeCloseTo(
+      cursorStart.x +
+        typedStart.current.length * curXStep +
+        (skippedWord.length + 1) * curXStep
+    );
+  });
+
+  it("cursor jump on mid word", () => {
+    const typedStart = {
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "f" }],
+    };
+    const currCursor = {
+      x: cursorStart.x + curXStep * typedStart.current.length,
+      y: cursorStart.y,
+    };
+    const result = getCursorMovement(
+      " ",
+      typedStart,
+      codeBlockSimple,
+      currCursor
+    );
+    const skippedSubstr = codeBlockSimple
+      .split(" ")[0]
+      .split("")
+      .splice(typedStart.current.length);
+
+    expect(result.x).toBeCloseTo(
+      cursorStart.x +
+        typedStart.current.length * curXStep +
+        (skippedSubstr.length + 1) * curXStep
+    );
+  });
+
+  it.todo("cursor jump on skip of last word of line");
   it.todo("New line - no indentation");
   it.todo("New line - autoindent");
 });
