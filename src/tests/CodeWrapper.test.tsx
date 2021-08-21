@@ -8,11 +8,13 @@ const {
   cursorStart,
   tab,
   getCursorMovement,
-  getNextTyped,
+  getNewTyped,
   bisectWord,
   isWordComplete,
   getLastWord,
   getBareElements,
+  getCursorOffset,
+  getNextWord,
 } = testing;
 
 describe("CodeWrapper", () => {
@@ -158,15 +160,18 @@ describe("getCursorMovement", () => {
     expect(result.y).toBeCloseTo(cursorStart.y);
   });
 
-  it.todo("space mid word jump to next word");
+  // need to check the next word in wordList but maybe should simplify the args
+  // for getCursorMovement first
   it.todo("New line - no indentation");
   it.todo("New line - autoindent");
+  it.todo("New line - backspace immediately");
+  it.todo("space mid word jump to next word");
 });
 
 /**
- * getNextTyped
+ * getNewTyped
  */
-describe("getNextTyped", () => {
+describe("getNewTyped", () => {
   const codeBlockSimple = "foo bar baz";
   const typedStart: Typed = {
     currentWordId: 0,
@@ -174,7 +179,7 @@ describe("getNextTyped", () => {
   };
 
   it("backspace on start", () => {
-    const next = getNextTyped(
+    const next = getNewTyped(
       "Backspace",
       { currentWordId: 0, current: [] },
       codeBlockSimple
@@ -183,7 +188,7 @@ describe("getNextTyped", () => {
   });
 
   it("single letter from start", () => {
-    const next = getNextTyped(
+    const next = getNewTyped(
       "a",
       { currentWordId: 0, current: [] },
       codeBlockSimple
@@ -196,7 +201,7 @@ describe("getNextTyped", () => {
   });
 
   it("backspace on letter", () => {
-    const next = getNextTyped(
+    const next = getNewTyped(
       "Backspace",
       {
         currentWordId: 0,
@@ -229,13 +234,13 @@ describe("getNextTyped", () => {
     };
 
     for (let i = 0; i < 9; ++i) {
-      next = getNextTyped("o", next, codeBlockSimple);
+      next = getNewTyped("o", next, codeBlockSimple);
     }
     expect(next).toEqual(result);
   });
 
   it("space increments wordId", () => {
-    const next = getNextTyped(
+    const next = getNewTyped(
       " ",
       {
         currentWordId: 0,
@@ -265,11 +270,11 @@ describe("getNextTyped", () => {
       currentWordId: 0,
       current: [],
     };
-    next = getNextTyped("f", next, codeBlockSimple);
-    next = getNextTyped("o", next, codeBlockSimple);
-    next = getNextTyped("o", next, codeBlockSimple);
+    next = getNewTyped("f", next, codeBlockSimple);
+    next = getNewTyped("o", next, codeBlockSimple);
+    next = getNewTyped("o", next, codeBlockSimple);
     for (let i = 0; i < overflow_limit + 3; ++i) {
-      next = getNextTyped("o", next, codeBlockSimple);
+      next = getNewTyped("o", next, codeBlockSimple);
     }
     expect(next).toEqual(result);
   });
@@ -289,11 +294,11 @@ describe("getNextTyped", () => {
       currentWordId: 0,
       current: [],
     };
-    next = getNextTyped("f", next, "\nfoo\n");
-    next = getNextTyped("o", next, "\nfoo\n");
-    next = getNextTyped("o", next, "\nfoo\n");
+    next = getNewTyped("f", next, "\nfoo\n");
+    next = getNewTyped("o", next, "\nfoo\n");
+    next = getNewTyped("o", next, "\nfoo\n");
     for (let i = 0; i < overflow_limit + 3; ++i) {
-      next = getNextTyped("o", next, "\nfoo\n");
+      next = getNewTyped("o", next, "\nfoo\n");
     }
     expect(next).toEqual(result);
   });

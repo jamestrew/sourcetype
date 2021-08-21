@@ -50,7 +50,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     setCursorPos(getCursorMovement(event.key, typed, codeBlock, cursorPos));
-    setTyped(getNextTyped(event.key, typed, codeBlock));
+    setTyped(getNewTyped(event.key, typed, codeBlock));
   };
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -164,7 +164,7 @@ const smartSplit = (str: string | null): string[][] => {
   return words;
 };
 
-const getCursorOffset = (typed: Typed, codeBlock: string) => {
+const getCursorOffset = (typed: Typed, codeBlock: string): number => {
   return Math.max(
     0,
     codeBlock.trim().split(/[\n ]/)[typed.currentWordId].length -
@@ -225,9 +225,9 @@ const getCursorMovement = (
  * @param {string} key - keypress char
  * @param {Typed} typed - current typed state
  * @param {string} codeBlock - code block to be typed
- * @returns {Typed} the current typed state
+ * @returns {Typed} the new typed state
  */
-const getNextTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
+const getNewTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
   /**
    * Gets the WordListElement.wordId for the given event.key
    * @inner
@@ -327,9 +327,11 @@ export const testing = {
   smartSplit,
   tab,
   getCursorMovement,
-  getNextTyped,
+  getNewTyped,
   bisectWord,
   isWordComplete,
   getLastWord,
   getBareElements,
+  getCursorOffset,
+  getNextWord,
 };
