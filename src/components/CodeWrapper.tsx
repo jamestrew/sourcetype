@@ -24,8 +24,8 @@ type FocusWarning = "hidden" | "";
 type Blurred = "blurred" | "";
 
 const curXStep = 0.582;
-const curYStep = 7.5;
-const cursorStart = { x: 0, y: 0.1875 };
+const curYStep = 1.875;
+const cursorStart = { x: 0, y: -0.2 };
 const tab = "&#x9;";
 const overflow_limit = 10;
 
