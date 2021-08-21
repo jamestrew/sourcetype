@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CodeWrapper, Typed, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
@@ -43,12 +43,14 @@ describe("CodeWrapper", () => {
     const focusWarning = screen.getByTestId("focusWarning");
 
     userEvent.click(focusWarning);
-    const timer = setTimeout(() => {
-      expect(codeInput).not.toHaveFocus();
-      expect(focusWarning).not.toHaveClass("hidden");
-      expect(codeWrapper).toHaveClass("blurred");
-    }, 1001);
-    clearTimeout(timer);
+    await waitFor(
+      () => {
+        expect(codeInput).not.toHaveFocus();
+        expect(focusWarning).not.toHaveClass("hidden");
+        expect(codeWrapper).toHaveClass("blurred");
+      },
+      { interval: 100, timeout: 1500 }
+    );
   });
 });
 
