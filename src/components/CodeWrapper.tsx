@@ -189,7 +189,7 @@ const getCursorMovement = (
   let offset = 0;
   if (key === "Backspace") {
     // prevent cursor floating out of bounds
-    if (typed.current.length === 0) return cursorPos;
+    if (cursorPos.x === 0) return cursorPos;
     if (getLastWord(typed).length === 0) {
       // user is correcting previous word
       const next = {
@@ -199,6 +199,10 @@ const getCursorMovement = (
       offset = getCursorOffset(next, codeBlock) + 1;
     }
     cursorPos.x -= offset === 0 ? curXStep : offset * curXStep;
+  } else if (key === "Enter") {
+    cursorPos.y += curYStep;
+    cursorPos.x = 0;
+    return cursorPos;
   } else {
     let isOverflow = false;
     if (key === " ") {
@@ -243,6 +247,9 @@ const getNewTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
     // Remove letter from the current state
     typed.current.pop();
     typed.currentWordId = getNextId();
+  } else if (key === "Enter") {
+    typed.currentWordId = getNextId() + 1;
+    return { ...typed };
   } else {
     // Append the next letter from the event.key
     let nextId = getNextId();
@@ -318,6 +325,32 @@ const getLastWord = (typed: Typed): Typed["current"] => {
  */
 const getBareElements = (input: Typed["current"]): string => {
   return input.map((i) => i.letter).reduce((r, i) => r + i, "");
+};
+
+/**
+ * Gets the string literal of a given input state
+ * @param {number} wordId - id of the word to splice out
+ * @param {string[][]} wordList - nested list of words in the code snippet
+ * @returns {string | null} the next word, new line == "", EOF = null
+ */
+let wordIdx = 0;
+const getNextWord = (wordId: number, wordList: string[][]): string | null => {
+  if (wordList[0].length === 0) return null;
+
+  const lineCnt = wordList.length;
+  for (let i = 0; i < lineCnt; i++) {
+    const lineLength = wordList[i].length;
+    for (let j = 0; j < lineLength; j++) {
+      if (wordIdx === wordId) {
+        if (j + 1 >= lineLength && i + 1 < lineCnt) {
+          return wordList[i + 1][0];
+        }
+        return wordList[i][j + 1] || null;
+      }
+      wordIdx++;
+    }
+  }
+  return null;
 };
 
 export const testing = {

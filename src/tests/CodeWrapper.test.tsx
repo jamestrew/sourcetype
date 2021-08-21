@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CodeWrapper, Typed, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
@@ -45,12 +45,14 @@ describe("CodeWrapper", () => {
     const focusWarning = screen.getByTestId("focusWarning");
 
     userEvent.click(focusWarning);
-    const timer = setTimeout(() => {
-      expect(codeInput).not.toHaveFocus();
-      expect(focusWarning).not.toHaveClass("hidden");
-      expect(codeWrapper).toHaveClass("blurred");
-    }, 1001);
-    clearTimeout(timer);
+    await waitFor(
+      () => {
+        expect(codeInput).not.toHaveFocus();
+        expect(focusWarning).not.toHaveClass("hidden");
+        expect(codeWrapper).toHaveClass("blurred");
+      },
+      { interval: 100, timeout: 1500 }
+    );
   });
 });
 
@@ -110,6 +112,26 @@ lines`;
       ["def", "func:"],
       [tab, "if", "foo:"],
       [tab, tab, "return", "True"],
+    ];
+    expect(smartSplit(str)).toEqual(result);
+  });
+
+  it("consecutive newlines", () => {
+    const str = `
+def func:
+  if foo:
+    return True
+
+
+func()
+`;
+    const result = [
+      ["def", "func:"],
+      [tab, "if", "foo:"],
+      [tab, tab, "return", "True"],
+      [""],
+      [""],
+      ["func()"],
     ];
     expect(smartSplit(str)).toEqual(result);
   });
@@ -306,6 +328,8 @@ describe("getNewTyped", () => {
   it.todo("enter on start");
   it.todo("enter skips multiple words");
   it.todo("enter at end-of-line");
+  it.todo("many backspaces after new line");
+  it.todo("goto next word on enter");
 });
 
 /**
@@ -424,5 +448,73 @@ describe("getBareElements", () => {
       ],
     };
     expect(getBareElements(next.current)).toEqual("foo bar");
+  });
+});
+
+/**
+ * getCursorOffset
+ */
+describe("getCursorOffset", () => {
+  const typed = {
+    currentWordId: 1,
+    current: [
+      { wordId: 0, letter: "f" },
+      { wordId: 0, letter: "o" },
+      { wordId: 0, letter: "o" },
+      { wordId: 1, letter: " " },
+      { wordId: 1, letter: "b" },
+      { wordId: 1, letter: "a" },
+      { wordId: 1, letter: "r" },
+    ],
+  };
+
+  it("initial state", () => {
+    const next = {
+      currentWordId: 0,
+      current: [],
+    };
+    expect(getCursorOffset(next, "foo bar")).toEqual(3);
+  });
+
+  it("no offset", () => {
+    expect(getCursorOffset(typed, "foo bar")).toEqual(0);
+  });
+
+  it("simple offset", () => {
+    expect(getCursorOffset(typed, "foo barbaz")).toEqual(3);
+  });
+
+  it("simple offset with enter", () => {
+    typed.current.splice(3, 1, { wordId: 1, letter: "\n" });
+    expect(getCursorOffset(typed, "foo\nbarbaz")).toEqual(3);
+  });
+});
+
+/**
+ * getNextWord
+ */
+describe("getNextWord", () => {
+  it("empty codeBlock", () => {
+    expect(getNextWord(0, [[]])).toEqual(null);
+  });
+
+  it("single line, first of two words", () => {
+    expect(getNextWord(0, [["foo", "bar"]])).toEqual("bar");
+  });
+
+  it("single line, last word", () => {
+    expect(getNextWord(1, [["foo", "bar"]])).toEqual(null);
+  });
+
+  it("two lines, next word on next line", () => {
+    expect(getNextWord(1, [["foo"], ["bar"]])).toEqual("bar");
+  });
+
+  it("two lines, next word autoindent", () => {
+    expect(getNextWord(1, [["foo"], [tab, "bar"]])).toEqual(tab);
+  });
+
+  it("two lines, next word newline", () => {
+    expect(getNextWord(1, [["foo"], [""]])).toEqual("");
   });
 });
