@@ -28,7 +28,7 @@ type Blurred = "blurred" | "";
 const curXStep = 0.582;
 const curYStep = 1.875;
 const cursorStart = { x: 0, y: -0.2 };
-const overflow_limit = 10;
+const OVERFLOW_LIMIT = 10;
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   const [cursorPos, setCursorPos] = useState(cursorStart);
@@ -149,15 +149,15 @@ const getCursorOffset = (typed: Typed, codeBlock: string): number => {
 };
 
 /**
- * Check if key press is to be processed or bypassed
+ * Check if key press is to be ignored
  * @param {string} key - pressed key
  * @param {string} bSplitCode - space and newline split code
  * @param {string[][]} sSplitCode - list of lines of list of words
  * @param {Typed} typed - current typed state
  * @param {CursorPos} cursorPos - current cursor position
- * @returns {boolean} true => correct, otherwise false
+ * @returns {boolean} true => key to be ignore, otherwise false
  */
-const bypassCheck = (
+const ignoreInputCheck = (
   key: string,
   sSplitCode: string[][],
   bSplitCode: string[],
@@ -171,6 +171,10 @@ const bypassCheck = (
     if (backspaceBypass(cursorPos.x, prevTypedCorrect)) return true;
   } else if (key === ENTER) {
     if (enterBypass(typed.currentWordId, sSplitCode)) return true;
+  } else {
+    const currentTypedLen = getCurrentTyped(typed).length;
+    const currentWordLen = bSplitCode[typed.currentWordId].length;
+    if (currentWordLen + OVERFLOW_LIMIT <= currentTypedLen) return true;
   }
   return false;
 };
