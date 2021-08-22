@@ -5,17 +5,20 @@ import "@testing-library/jest-dom/extend-expect";
 const {
   smartSplit,
   curXStep,
-  cursorStart,
+  curYStep,
+  // cursorStart,
   tab,
   getCursorMovement,
   getNewTyped,
   bisectWord,
   isWordComplete,
-  getLastWord,
+  getCurrentTyped,
   getBareElements,
   getCursorOffset,
-  getNextWord,
+  getWord,
 } = testing;
+
+const cursorStart = { x: 0, y: -0.2 };
 
 describe("CodeWrapper", () => {
   beforeEach(() => {
@@ -149,6 +152,8 @@ describe("getCursorMovement", () => {
       "Backspace",
       typedStart,
       codeBlockSimple,
+      "foo",
+      "bar",
       cursorStart
     );
     expect(result).toEqual(cursorStart);
@@ -161,7 +166,12 @@ describe("getCursorMovement", () => {
       "r",
       typedStart,
       codeBlockSimple,
-      cursorStart
+      "foo",
+      "bar",
+      {
+        x: cursorStart.x,
+        y: cursorStart.y,
+      }
     );
     expect(result).toEqual(expected);
   });
@@ -176,6 +186,8 @@ describe("getCursorMovement", () => {
       "Backspace",
       typedStart,
       codeBlockSimple,
+      "foo",
+      "bar",
       curCurrent
     );
     expect(result.x).toBeCloseTo(cursorStart.x);
@@ -184,9 +196,131 @@ describe("getCursorMovement", () => {
 
   // need to check the next word in wordList but maybe should simplify the args
   // for getCursorMovement first
-  it.todo("New line - no indentation");
-  it.todo("New line - autoindent");
-  it.todo("New line - backspace immediately");
+  it("New line - no indentation", () => {
+    const expected = { x: cursorStart.x, y: cursorStart.y + curYStep };
+    const typedStart = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+      ],
+    };
+    const codeBlock = `
+foo
+boo
+ `;
+    const result = getCursorMovement(
+      "Enter",
+      typedStart,
+      codeBlock,
+      "foo",
+      "",
+      {
+        x: cursorStart.x + 3 * curXStep,
+        y: cursorStart.y,
+      }
+    );
+    expect(result.x).toBeCloseTo(expected.x);
+    expect(result.y).toBeCloseTo(expected.y);
+  });
+
+  it("New line - autoindent", () => {
+    const expected = {
+      x: cursorStart.x + 2 * curXStep,
+      y: cursorStart.y + curYStep,
+    };
+    const typedStart = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+      ],
+    };
+    const codeBlock = `
+foo
+  boo
+ `;
+    const result = getCursorMovement(
+      "Enter",
+      typedStart,
+      codeBlock,
+      "foo",
+      tab,
+      {
+        x: cursorStart.x + 3 * curXStep,
+        y: cursorStart.y,
+      }
+    );
+    expect(result.x).toBeCloseTo(expected.x);
+    expect(result.y).toBeCloseTo(expected.y);
+  });
+
+  it("New line - backspace immediately", () => {
+    const expected = {
+      x: cursorStart.x,
+      y: cursorStart.y + curYStep,
+    };
+    const typedStart = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+      ],
+    };
+    const codeBlock = `
+foo
+boo
+ `;
+    const result = getCursorMovement(
+      "Backspace",
+      typedStart,
+      codeBlock,
+      "foo",
+      "boo",
+      {
+        x: cursorStart.x,
+        y: cursorStart.y + curYStep,
+      }
+    );
+    expect(result.x).toBeCloseTo(expected.x);
+    expect(result.y).toBeCloseTo(expected.y);
+  });
+
+  it("New line autoindented - backspace immediately", () => {
+    const expected = {
+      x: cursorStart.x + 2 * curXStep,
+      y: cursorStart.y + curYStep,
+    };
+    const typedStart = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+      ],
+    };
+    const codeBlock = `
+foo
+  boo
+ `;
+    const result = getCursorMovement(
+      "Backspace",
+      typedStart,
+      codeBlock,
+      tab,
+      "boo",
+      {
+        x: cursorStart.x + 2 * curXStep,
+        y: cursorStart.y + curYStep,
+      }
+    );
+    expect(result.x).toBeCloseTo(expected.x);
+    expect(result.y).toBeCloseTo(expected.y);
+  });
+
   it.todo("space mid word jump to next word");
 });
 
@@ -400,7 +534,7 @@ describe("getLastWord", () => {
       currentWordId: 0,
       current: [],
     };
-    expect(getLastWord(next)).toEqual([]);
+    expect(getCurrentTyped(next)).toEqual([]);
   });
 
   it("last word extracted", () => {
@@ -418,7 +552,7 @@ describe("getLastWord", () => {
       { wordId: 1, letter: "o" },
       { wordId: 1, letter: "o" },
     ];
-    expect(getLastWord(next)).toEqual(result);
+    expect(getCurrentTyped(next)).toEqual(result);
   });
 });
 
@@ -491,30 +625,44 @@ describe("getCursorOffset", () => {
 });
 
 /**
- * getNextWord
+ * getWord
  */
-describe("getNextWord", () => {
+describe("getWord", () => {
   it("empty codeBlock", () => {
-    expect(getNextWord(0, [[]])).toEqual(null);
+    expect(getWord(0, [[]])).toEqual(null);
   });
 
   it("single line, first of two words", () => {
-    expect(getNextWord(0, [["foo", "bar"]])).toEqual("bar");
+    expect(getWord(0, [["foo", "bar"]])).toEqual("foo");
   });
 
   it("single line, last word", () => {
-    expect(getNextWord(1, [["foo", "bar"]])).toEqual(null);
+    expect(getWord(1, [["foo", "bar"]])).toEqual("bar");
   });
 
-  it("two lines, next word on next line", () => {
-    expect(getNextWord(1, [["foo"], ["bar"]])).toEqual("bar");
+  it("two words on two lines, last word", () => {
+    expect(getWord(1, [["foo"], ["bar"]])).toEqual("bar");
+  });
+
+  it("two lines, last word + one", () => {
+    expect(getWord(2, [["foo"], ["bar"]])).toEqual(null);
   });
 
   it("two lines, next word autoindent", () => {
-    expect(getNextWord(1, [["foo"], [tab, "bar"]])).toEqual(tab);
+    expect(getWord(1, [["foo"], [tab, "bar"]])).toEqual(tab);
   });
 
   it("two lines, next word newline", () => {
-    expect(getNextWord(1, [["foo"], [""]])).toEqual("");
+    expect(getWord(1, [["foo"], [""]])).toEqual("");
+  });
+
+  it("prev word tab check", () => {
+    expect(
+      getWord(3, [
+        ["if", "(true)", "{"],
+        [tab, "const", "foo", "=", "'bar'"],
+        ["}"],
+      ])
+    ).toEqual(tab);
   });
 });

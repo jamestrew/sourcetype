@@ -49,7 +49,18 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
    */
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    setCursorPos(getCursorMovement(event.key, typed, codeBlock, cursorPos));
+    const nextWord = getWord(typed.currentWordId + 1, wordList);
+    const prevWord = getWord(typed.currentWordId - 1, wordList);
+    setCursorPos(
+      getCursorMovement(
+        event.key,
+        typed,
+        codeBlock,
+        prevWord,
+        nextWord,
+        cursorPos
+      )
+    );
     setTyped(getNewTyped(event.key, typed, codeBlock));
   };
 
@@ -117,7 +128,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
           data-testid="codeInput"
           ref={focusInputRef}
           tabIndex={0}
-          defaultValue={getBareElements(getLastWord(typed))}
+          defaultValue={getBareElements(getCurrentTyped(typed))}
           autoComplete="off"
           onKeyPress={handleKeyPress}
           onKeyDown={(e) => e.key === "Backspace" && handleKeyPress(e)}
@@ -168,15 +179,18 @@ const getCursorOffset = (typed: Typed, codeBlock: string): number => {
   return Math.max(
     0,
     codeBlock.trim().split(/[\n ]/)[typed.currentWordId].length -
-      getLastWord(typed).length
+      getCurrentTyped(typed).length
   );
 };
 
+// NOTE: maybe pass wordList can eval prev & next word internally
 /**
  * Gets a new cursorPos state when input is received
  * @param {string} key - keypress char
  * @param {Typed} typed - current typed state
  * @param {string} codeBlock - code block to be typed
+ * @param {string | null} nextWord - next word to be typed
+ * @param {string | null} prevWord - prev word typed
  * @param {CursorPos} cursorPos - current cursor position
  * @returns {CursorPos}
  */
@@ -184,13 +198,15 @@ const getCursorMovement = (
   key: string,
   typed: Typed,
   codeBlock: string,
+  prevWord: string | null,
+  nextWord: string | null,
   cursorPos: CursorPos
 ): CursorPos => {
   let offset = 0;
   if (key === "Backspace") {
     // prevent cursor floating out of bounds
-    if (cursorPos.x === 0) return cursorPos;
-    if (getLastWord(typed).length === 0) {
+    if (cursorPos.x === cursorStart.x || prevWord === tab) return cursorPos;
+    if (getCurrentTyped(typed).length === 0) {
       // user is correcting previous word
       const next = {
         currentWordId: typed.currentWordId - 1,
@@ -200,8 +216,9 @@ const getCursorMovement = (
     }
     cursorPos.x -= offset === 0 ? curXStep : offset * curXStep;
   } else if (key === "Enter") {
+    // TODO: add check to bypass "Enter" if mid line (same with getNewTyped)
     cursorPos.y += curYStep;
-    cursorPos.x = 0;
+    cursorPos.x = nextWord !== tab ? 0 : 2 * curXStep;
     return cursorPos;
   } else {
     let isOverflow = false;
@@ -209,7 +226,7 @@ const getCursorMovement = (
       // check for skipped letters
       offset = getCursorOffset(typed, codeBlock) + 1;
     } else if (
-      getLastWord(typed).length - overflow_limit >=
+      getCurrentTyped(typed).length - overflow_limit >=
       codeBlock.trim().split(/[\n ]/)[typed.currentWordId].length
     ) {
       // prevent cursor floating past words
@@ -248,7 +265,13 @@ const getNewTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
     typed.current.pop();
     typed.currentWordId = getNextId();
   } else if (key === "Enter") {
+    // TODO: add check to bypass "Enter" if mid line (same with getCursorMovement)
     typed.currentWordId = getNextId() + 1;
+    // NOTE: do we push '\n' here? have to push something
+    typed.current.push({
+      wordId: typed.currentWordId,
+      letter: "\n",
+    });
     return { ...typed };
   } else {
     // Append the next letter from the event.key
@@ -256,7 +279,7 @@ const getNewTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
     if (key === " ") nextId += 1;
     if (
       nextId !== typed.currentWordId ||
-      getLastWord(typed).length - overflow_limit <
+      getCurrentTyped(typed).length - overflow_limit <
         codeBlock.trim().split(/[\n ]/)[typed.currentWordId].length
     ) {
       typed.current.push({
@@ -312,9 +335,9 @@ const isWordComplete = (wordId: number, typed: Typed): boolean => {
 
 /**
  * Gets the current word being typed
- * @returns {Typed["current"]} the last word
+ * @returns {Typed["current"]} the currently typed word
  */
-const getLastWord = (typed: Typed): Typed["current"] => {
+const getCurrentTyped = (typed: Typed): Typed["current"] => {
   return bisectWord(typed.currentWordId, typed);
 };
 
@@ -328,26 +351,23 @@ const getBareElements = (input: Typed["current"]): string => {
 };
 
 /**
- * Gets the string literal of a given input state
- * @param {number} wordId - id of the word to splice out
+ * Gets word at a given index in wordList
+ * @param {number} wordIdx - id of the word to splice out
  * @param {string[][]} wordList - nested list of words in the code snippet
  * @returns {string | null} the next word, new line == "", EOF = null
  */
-let wordIdx = 0;
-const getNextWord = (wordId: number, wordList: string[][]): string | null => {
+const getWord = (wordIdx: number, wordList: string[][]): string | null => {
   if (wordList[0].length === 0) return null;
+  let idx = 0;
 
   const lineCnt = wordList.length;
   for (let i = 0; i < lineCnt; i++) {
     const lineLength = wordList[i].length;
     for (let j = 0; j < lineLength; j++) {
-      if (wordIdx === wordId) {
-        if (j + 1 >= lineLength && i + 1 < lineCnt) {
-          return wordList[i + 1][0];
-        }
-        return wordList[i][j + 1] || null;
-      }
-      wordIdx++;
+      if (idx === wordIdx) {
+        return wordList[i][j];
+      } else if (idx > wordIdx) break;
+      idx++;
     }
   }
   return null;
@@ -363,8 +383,8 @@ export const testing = {
   getNewTyped,
   bisectWord,
   isWordComplete,
-  getLastWord,
+  getCurrentTyped,
   getBareElements,
   getCursorOffset,
-  getNextWord,
+  getWord,
 };

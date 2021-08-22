@@ -3,7 +3,9 @@ import { CodeWrapper } from "./CodeWrapper";
 function Practice() {
   const code = `
 if (true) {
-  return 'foo'
+  if (bar) {
+    return 'foo'
+  }
 }
   `;
   return (
