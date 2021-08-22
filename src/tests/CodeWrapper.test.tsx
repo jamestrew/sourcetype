@@ -16,6 +16,8 @@ const {
   getCursorOffset,
   getWord,
   backspaceBypass,
+  prevTypedCheck,
+  enterBypass,
 } = testing;
 
 const cursorStart = { x: 0, y: -0.2 };
@@ -558,20 +560,116 @@ describe("getWord", () => {
   });
 
   it("two lines, next word autoindent", () => {
-    expect(getWord(1, [["foo"], [tab, "bar"]])).toEqual(tab);
+    expect(getWord(1, [["foo"], [TAB, "bar"]])).toEqual(TAB);
   });
 
   it("two lines, next word newline", () => {
     expect(getWord(1, [["foo"], [""]])).toEqual("");
   });
 
-  it("prev word tab check", () => {
+  it("prev word TAB check", () => {
     expect(
       getWord(3, [
         ["if", "(true)", "{"],
-        [tab, "const", "foo", "=", "'bar'"],
+        [TAB, "const", "foo", "=", "'bar'"],
         ["}"],
       ])
-    ).toEqual(tab);
+    ).toEqual(TAB);
+  });
+});
+
+/**
+ * backspaceBypass
+ */
+describe("backspaceBypass", () => {
+  it("cursor at start", () => {
+    expect(backspaceBypass(cursorStart.x, true)).toEqual(false);
+  });
+
+  it("cursor not at start, prev typed right", () => {
+    expect(backspaceBypass(cursorStart.x + curXStep, true)).toEqual(false);
+  });
+
+  it("cursor not at start, prev typed wrong", () => {
+    expect(backspaceBypass(cursorStart.x + curXStep, false)).toEqual(true);
+  });
+});
+
+/**
+ * prevTypedCheck
+ */
+describe("prevTypedCheck", () => {
+  it("prev word at start", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    expect(prevTypedCheck(typed, ["foo"])).toEqual(true);
+  });
+
+  it("prev word correct - same line", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    expect(prevTypedCheck(typed, ["foo", "bar"])).toEqual(true);
+  });
+
+  it("prev word wrong - same line", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "b" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    expect(prevTypedCheck(typed, ["foo", "bar"])).toEqual(false);
+  });
+
+  it("prev word right - next line", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "o" },
+        { wordId: 1, letter: "\n" },
+      ],
+    };
+    expect(prevTypedCheck(typed, ["foo", "bar"])).toEqual(true);
+  });
+  it("prev word wrong - next line", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+        { wordId: 0, letter: "b" },
+        { wordId: 1, letter: "\n" },
+      ],
+    };
+    expect(prevTypedCheck(typed, ["foo", "bar"])).toEqual(false);
+  });
+});
+
+/**
+ * enterBypass
+ */
+describe("enterBypass", () => {
+  it("mid line", () => {
+    const sSplitCode = [["foo", "bar"]];
+    expect(enterBypass(0, sSplitCode)).toEqual(true);
+  });
+
+  it("end of line", () => {
+    const sSplitCode = [["foo", "bar"]];
+    expect(enterBypass(1, sSplitCode)).toEqual(true);
   });
 });

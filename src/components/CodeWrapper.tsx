@@ -31,7 +31,6 @@ const cursorStart = { x: 0, y: -0.2 };
 const overflow_limit = 10;
 
 export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
-  let wordIdx = 0;
   const [cursorPos, setCursorPos] = useState(cursorStart);
   const [typed, setTyped] = useState<Typed>({
     currentWordId: 0,
@@ -50,8 +49,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     // TODO: probably should handle bypass key logic here (ignoring backspace, space, enter)
-    const nextWord = getWord(typed.currentWordId + 1, sSplitCode);
-    const prevWord = getWord(typed.currentWordId - 1, sSplitCode);
 
     setCursorPos(
       getCursorMovement(
@@ -102,6 +99,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
       >
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
         {sSplitCode.map((line, lineNum) => {
+          let wordIdx = 0;
           return (
             <div className="flex flex-wrap WordList" key={lineNum}>
               {line.map((wd, wdNum) => {
@@ -150,7 +148,79 @@ const getCursorOffset = (typed: Typed, codeBlock: string): number => {
   );
 };
 
-// NOTE: maybe pass wordList can eval prev & next word internally
+/**
+ * Check if key press is to be processed or bypassed
+ * @param {string} key - pressed key
+ * @param {string} bSplitCode - space and newline split code
+ * @param {string[][]} sSplitCode - list of lines of list of words
+ * @param {Typed} typed - current typed state
+ * @param {CursorPos} cursorPos - current cursor position
+ * @returns {boolean} true => correct, otherwise false
+ */
+const bypassCheck = (
+  key: string,
+  sSplitCode: string[][],
+  bSplitCode: string[],
+  typed: Typed,
+  cursorPos: CursorPos
+): boolean => {
+  if (key === BACKSPACE || key === ENTER) return true;
+  const prevTypedCorrect = prevTypedCheck(typed, bSplitCode);
+
+  if (key === BACKSPACE) {
+    if (backspaceBypass(cursorPos.x, prevTypedCorrect)) return true;
+  } else if (key === ENTER) {
+    if (enterBypass(typed.currentWordId, sSplitCode)) return true;
+  }
+  return false;
+};
+
+/**
+ * Check if previous word was typed correctly
+ * @param {Typed} typed - current typed state
+ * @param {string} bSplitCode - space and newline split code
+ * @returns {boolean} true => correct, otherwise false
+ */
+const prevTypedCheck = (typed: Typed, bSplitCode: string[]): boolean => {
+  if (typed.current.length === 0) return true;
+  const prevTypedId = typed.currentWordId - 1;
+  const prevTyped = getBareElements(bisectWord(prevTypedId, typed));
+  if (bSplitCode[prevTypedId] === prevTyped) return true;
+  return false;
+};
+
+/**
+ * Check if backspace input should bypass cursor/typed handling (be ignored)
+ * @param {number} curXPos - current cursor position in x direction
+ * @param {boolean} prevCorrect - whether previous word was typed correctly
+ * @returns {boolean} true => bypass/ignore, otherwise false
+ */
+const backspaceBypass = (curXPos: number, prevCorrect: boolean): boolean => {
+  if (curXPos === cursorStart.x || prevCorrect) return false;
+  return true;
+};
+
+/**
+ * Check if enter input should bypass cursor/typed handling (be ignored)
+ * @param {number} wordId - wordId to be checked against enter bypass
+ * @param {string[][]} sSplitCode - list of lines of list of words
+ * @returns {boolean} true => bypass/ignore, otherwise false
+ */
+const enterBypass = (wordId: number, sSplitCode: string[][]): boolean => {
+  let idx = 0;
+  for (let i = 0; i < sSplitCode.length; i++) {
+    for (let j = 0; j < sSplitCode.length; j++) {
+      if (wordId === idx) {
+        if (j === sSplitCode[i].length) return false;
+        break;
+      }
+      if (sSplitCode[i][j] !== TAB) idx++;
+    }
+  }
+  return true;
+};
+
+// NOTE: maybe pass sSplitCode can eval prev & next word internally
 /**
  * Gets a new cursorPos state when input is received
  * @param {string} key - keypress char
@@ -349,4 +419,7 @@ export const testing = {
   getBareElements,
   getCursorOffset,
   getWord,
+  backspaceBypass,
+  prevTypedCheck,
+  enterBypass,
 };
