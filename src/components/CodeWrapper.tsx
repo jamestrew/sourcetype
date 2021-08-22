@@ -49,6 +49,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
    */
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
+    // TODO: probably should handle bypass key logic here (ignoring backspace, space, enter)
     const nextWord = getWord(typed.currentWordId + 1, wordList);
     const prevWord = getWord(typed.currentWordId - 1, wordList);
     setCursorPos(
@@ -205,6 +206,7 @@ const getCursorMovement = (
   let offset = 0;
   if (key === "Backspace") {
     // prevent cursor floating out of bounds
+    // TODO: backspace after after new word/line should be skipped unless prev word is wrong
     if (cursorPos.x === cursorStart.x || prevWord === tab) return cursorPos;
     if (getCurrentTyped(typed).length === 0) {
       // user is correcting previous word
@@ -261,6 +263,7 @@ const getNewTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
     return typed.current[currLength - 1].wordId;
   };
   if (key === "Backspace") {
+    // TODO: backspace after after new word/line should be skipped unless prev word is wrong
     // Remove letter from the current state
     typed.current.pop();
     typed.currentWordId = getNextId();
