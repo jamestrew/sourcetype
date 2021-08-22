@@ -357,16 +357,11 @@ const getBareElements = (input: Typed["current"]): string => {
  * @returns {string | null} the next word, new line == "", EOF = null
  */
 const getWord = (wordIdx: number, wordList: string[][]): string | null => {
-  if (wordList[0].length === 0) return null;
   let idx = 0;
-
-  const lineCnt = wordList.length;
-  for (let i = 0; i < lineCnt; i++) {
-    const lineLength = wordList[i].length;
-    for (let j = 0; j < lineLength; j++) {
-      if (idx === wordIdx) {
-        return wordList[i][j];
-      } else if (idx > wordIdx) break;
+  for (let i = 0; i < wordList.length; i++) {
+    for (let j = 0; j < wordList[i].length; j++) {
+      if (idx > wordIdx) break;
+      if (idx === wordIdx) return wordList[i][j];
       idx++;
     }
   }
