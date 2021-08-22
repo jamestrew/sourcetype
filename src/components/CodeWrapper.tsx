@@ -2,9 +2,11 @@ import { KeyboardEvent, FC, useState, useRef } from "react";
 import { Cursor } from "./Cursor";
 import { Word } from "components/Word";
 import { Tab } from "./Tab";
+import { TAB, BACKSPACE, ENTER } from "../utils/constants";
 
 interface ICodeWrapper {
-  codeBlock: string;
+  sSplitCode: string[][];
+  bSplitCode: string[];
 }
 
 export type Typed = {
@@ -26,12 +28,10 @@ type Blurred = "blurred" | "";
 const curXStep = 0.582;
 const curYStep = 1.875;
 const cursorStart = { x: 0, y: -0.2 };
-const tab = "&#x9;";
 const overflow_limit = 10;
 
-export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
+export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   let wordIdx = 0;
-  const wordList = smartSplit(codeBlock);
   const [cursorPos, setCursorPos] = useState(cursorStart);
   const [typed, setTyped] = useState<Typed>({
     currentWordId: 0,
@@ -50,8 +50,9 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     // TODO: probably should handle bypass key logic here (ignoring backspace, space, enter)
-    const nextWord = getWord(typed.currentWordId + 1, wordList);
-    const prevWord = getWord(typed.currentWordId - 1, wordList);
+    const nextWord = getWord(typed.currentWordId + 1, sSplitCode);
+    const prevWord = getWord(typed.currentWordId - 1, sSplitCode);
+
     setCursorPos(
       getCursorMovement(
         event.key,
@@ -100,11 +101,11 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
         ref={blurCodeRef}
       >
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
-        {wordList.map((line, lineNum) => {
+        {sSplitCode.map((line, lineNum) => {
           return (
             <div className="flex flex-wrap WordList" key={lineNum}>
               {line.map((wd, wdNum) => {
-                if (wd === tab)
+                if (wd === TAB)
                   return (
                     <Tab key={`${lineNum}:${wdNum}`} spaceSize={curXStep} />
                   );
@@ -132,48 +133,13 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ codeBlock }) => {
           defaultValue={getBareElements(getCurrentTyped(typed))}
           autoComplete="off"
           onKeyPress={handleKeyPress}
-          onKeyDown={(e) => e.key === "Backspace" && handleKeyPress(e)}
+          onKeyDown={(e) => e.key === BACKSPACE && handleKeyPress(e)}
           onBlur={handleFocusOut}
           autoFocus
         />
       </div>
     </>
   );
-};
-
-/**
- * Tokenizes a formatted multi-line code block
- * @param {(string | null)} str - a code block
- * @returns {string[][]} array of words and format strings per line
- */
-const smartSplit = (str: string | null): string[][] => {
-  let words: string[][] = [];
-  if (str == null || str === "") return words;
-
-  str = str.trim();
-
-  let word = "";
-  let line = [];
-  for (let i = 0; i <= str.length; i++) {
-    if (str[i] === " " || i === str.length) {
-      if (str[i + 1] === " ") {
-        if (word) line.push(word);
-        word = tab;
-        i++;
-      }
-      line.push(word);
-      word = "";
-    } else if (str[i] === "\n") {
-      line.push(word);
-      words.push(line);
-      line = [];
-      word = "";
-    } else {
-      word += str[i];
-    }
-  }
-  words.push(line);
-  return words;
 };
 
 const getCursorOffset = (typed: Typed, codeBlock: string): number => {
@@ -204,10 +170,10 @@ const getCursorMovement = (
   cursorPos: CursorPos
 ): CursorPos => {
   let offset = 0;
-  if (key === "Backspace") {
+  if (key === BACKSPACE) {
     // prevent cursor floating out of bounds
     // TODO: backspace after after new word/line should be skipped unless prev word is wrong
-    if (cursorPos.x === cursorStart.x || prevWord === tab) return cursorPos;
+    if (cursorPos.x === cursorStart.x || prevWord === TAB) return cursorPos;
     if (getCurrentTyped(typed).length === 0) {
       // user is correcting previous word
       const next = {
@@ -217,10 +183,10 @@ const getCursorMovement = (
       offset = getCursorOffset(next, codeBlock) + 1;
     }
     cursorPos.x -= offset === 0 ? curXStep : offset * curXStep;
-  } else if (key === "Enter") {
+  } else if (key === ENTER) {
     // TODO: add check to bypass "Enter" if mid line (same with getNewTyped)
     cursorPos.y += curYStep;
-    cursorPos.x = nextWord !== tab ? 0 : 2 * curXStep;
+    cursorPos.x = nextWord !== TAB ? 0 : 2 * curXStep;
     return cursorPos;
   } else {
     let isOverflow = false;
@@ -267,7 +233,7 @@ const getNewTyped = (key: string, typed: Typed, codeBlock: string): Typed => {
     // Remove letter from the current state
     typed.current.pop();
     typed.currentWordId = getNextId();
-  } else if (key === "Enter") {
+  } else if (key === ENTER) {
     // TODO: add check to bypass "Enter" if mid line (same with getCursorMovement)
     typed.currentWordId = getNextId() + 1;
     // NOTE: do we push '\n' here? have to push something
@@ -354,17 +320,17 @@ const getBareElements = (input: Typed["current"]): string => {
 };
 
 /**
- * Gets word at a given index in wordList
+ * Gets word at a given index in sSplitCode
  * @param {number} wordIdx - id of the word to splice out
- * @param {string[][]} wordList - nested list of words in the code snippet
+ * @param {string[][]} sSplitCode - nested list of words in the code snippet
  * @returns {string | null} the next word, new line == "", EOF = null
  */
-const getWord = (wordIdx: number, wordList: string[][]): string | null => {
+const getWord = (wordIdx: number, sSplitCode: string[][]): string | null => {
   let idx = 0;
-  for (let i = 0; i < wordList.length; i++) {
-    for (let j = 0; j < wordList[i].length; j++) {
+  for (let i = 0; i < sSplitCode.length; i++) {
+    for (let j = 0; j < sSplitCode[i].length; j++) {
       if (idx > wordIdx) break;
-      if (idx === wordIdx) return wordList[i][j];
+      if (idx === wordIdx) return sSplitCode[i][j];
       idx++;
     }
   }
@@ -375,8 +341,6 @@ export const testing = {
   curXStep,
   curYStep,
   cursorStart,
-  smartSplit,
-  tab,
   getCursorMovement,
   getNewTyped,
   bisectWord,

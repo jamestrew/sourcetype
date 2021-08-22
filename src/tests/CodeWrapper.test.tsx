@@ -2,12 +2,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CodeWrapper, Typed, testing } from "components/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
+import { TAB, BACKSPACE, ENTER } from "../utils/constants";
 const {
-  smartSplit,
   curXStep,
   curYStep,
   // cursorStart,
-  tab,
   getCursorMovement,
   getNewTyped,
   bisectWord,
@@ -16,13 +15,14 @@ const {
   getBareElements,
   getCursorOffset,
   getWord,
+  backspaceBypass,
 } = testing;
 
 const cursorStart = { x: 0, y: -0.2 };
 
 describe("CodeWrapper", () => {
   beforeEach(() => {
-    render(<CodeWrapper codeBlock="foo" />);
+    render(<CodeWrapper sSplitCode={[["foo"]]} bSplitCode={["foo"]} />);
     jest.useFakeTimers();
   });
 
@@ -60,87 +60,6 @@ describe("CodeWrapper", () => {
 });
 
 /**
- * smartSplit
- */
-describe("smart splitting", () => {
-  it("blank codeBlock", () => {
-    expect(smartSplit("")).toEqual([]);
-  });
-
-  it("one line basic sentence", () => {
-    const str = "this app is sick";
-    const result = [["this", "app", "is", "sick"]];
-    expect(smartSplit(str)).toEqual(result);
-  });
-
-  it("poorly spaced one line basic sentence", () => {
-    const str = " this app is sick ";
-    const result = [["this", "app", "is", "sick"]];
-    expect(smartSplit(str)).toEqual(result);
-  });
-
-  it("one line sentence with tabs", () => {
-    const str = "these  are  tab  spaced";
-    const result = [["these", tab, "are", tab, "tab", tab, "spaced"]];
-    expect(smartSplit(str)).toEqual(result);
-  });
-
-  it("simply multiline", () => {
-    const str = `these
-are
-lines`;
-    const result = [["these"], ["are"], ["lines"]];
-    expect(smartSplit(str)).toEqual(result);
-  });
-
-  it("codeblock: basic if", () => {
-    const str = `if (true) {
-  const foo = 'bar'
-}`;
-    const result = [
-      ["if", "(true)", "{"],
-      [tab, "const", "foo", "=", "'bar'"],
-      ["}"],
-    ];
-    expect(smartSplit(str)).toEqual(result);
-  });
-
-  it("codeblock: python func", () => {
-    const str = `def func:
-  if foo:
-    return True
-
-  `;
-    const result = [
-      ["def", "func:"],
-      [tab, "if", "foo:"],
-      [tab, tab, "return", "True"],
-    ];
-    expect(smartSplit(str)).toEqual(result);
-  });
-
-  it("consecutive newlines", () => {
-    const str = `
-def func:
-  if foo:
-    return True
-
-
-func()
-`;
-    const result = [
-      ["def", "func:"],
-      [tab, "if", "foo:"],
-      [tab, tab, "return", "True"],
-      [""],
-      [""],
-      ["func()"],
-    ];
-    expect(smartSplit(str)).toEqual(result);
-  });
-});
-
-/**
  * getCursorMovement
  */
 describe("getCursorMovement", () => {
@@ -149,7 +68,7 @@ describe("getCursorMovement", () => {
   it("backspace on start", () => {
     const typedStart = { currentWordId: 0, current: [] };
     const result = getCursorMovement(
-      "Backspace",
+      BACKSPACE,
       typedStart,
       codeBlockSimple,
       "foo",
@@ -183,7 +102,7 @@ describe("getCursorMovement", () => {
     };
     const curCurrent = { x: cursorStart.x + curXStep, y: cursorStart.y };
     const result = getCursorMovement(
-      "Backspace",
+      BACKSPACE,
       typedStart,
       codeBlockSimple,
       "foo",
@@ -210,17 +129,10 @@ describe("getCursorMovement", () => {
 foo
 boo
  `;
-    const result = getCursorMovement(
-      "Enter",
-      typedStart,
-      codeBlock,
-      "foo",
-      "",
-      {
-        x: cursorStart.x + 3 * curXStep,
-        y: cursorStart.y,
-      }
-    );
+    const result = getCursorMovement(ENTER, typedStart, codeBlock, "foo", "", {
+      x: cursorStart.x + 3 * curXStep,
+      y: cursorStart.y,
+    });
     expect(result.x).toBeCloseTo(expected.x);
     expect(result.y).toBeCloseTo(expected.y);
   });
@@ -242,17 +154,10 @@ boo
 foo
   boo
  `;
-    const result = getCursorMovement(
-      "Enter",
-      typedStart,
-      codeBlock,
-      "foo",
-      tab,
-      {
-        x: cursorStart.x + 3 * curXStep,
-        y: cursorStart.y,
-      }
-    );
+    const result = getCursorMovement(ENTER, typedStart, codeBlock, "foo", TAB, {
+      x: cursorStart.x + 3 * curXStep,
+      y: cursorStart.y,
+    });
     expect(result.x).toBeCloseTo(expected.x);
     expect(result.y).toBeCloseTo(expected.y);
   });
@@ -275,7 +180,7 @@ foo
 boo
  `;
     const result = getCursorMovement(
-      "Backspace",
+      BACKSPACE,
       typedStart,
       codeBlock,
       "foo",
@@ -307,10 +212,10 @@ foo
   boo
  `;
     const result = getCursorMovement(
-      "Backspace",
+      BACKSPACE,
       typedStart,
       codeBlock,
-      tab,
+      TAB,
       "boo",
       {
         x: cursorStart.x + 2 * curXStep,
@@ -336,7 +241,7 @@ describe("getNewTyped", () => {
 
   it("backspace on start", () => {
     const next = getNewTyped(
-      "Backspace",
+      BACKSPACE,
       { currentWordId: 0, current: [] },
       codeBlockSimple
     );
@@ -358,7 +263,7 @@ describe("getNewTyped", () => {
 
   it("backspace on letter", () => {
     const next = getNewTyped(
-      "Backspace",
+      BACKSPACE,
       {
         currentWordId: 0,
         current: [
@@ -630,6 +535,10 @@ describe("getCursorOffset", () => {
 describe("getWord", () => {
   it("empty codeBlock", () => {
     expect(getWord(0, [[]])).toEqual(null);
+  });
+
+  it("prev word at start", () => {
+    expect(getWord(-1, [["foo", "bar"]])).toEqual(null);
   });
 
   it("single line, first of two words", () => {
