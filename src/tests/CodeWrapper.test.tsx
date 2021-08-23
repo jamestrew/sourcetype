@@ -586,23 +586,28 @@ describe("enterIgnore", () => {
  * countTabs
  */
 describe("countTabs", () => {
+  const sCode = [
+    ["if", "(true)", "{"],
+    [TAB, "if", "(bar)", "{"],
+    [TAB, TAB, "return", "'foo"],
+    [TAB, "}"],
+    ["}"],
+  ];
+
   it("one line - no indents", () => {
     const sCode = [["foo", "bar"]];
     expect(countTabs(0, sCode)).toEqual(0);
   });
 
   it("two line - no indents", () => {
-    const sCode = [["foo"], ["bar"]];
-    expect(countTabs(0, sCode)).toEqual(0);
+    expect(countTabs(9, sCode)).toEqual(0);
   });
 
   it("two line - one indents", () => {
-    const sCode = [["foo"], [TAB, "bar"]];
-    expect(countTabs(0, sCode)).toEqual(1);
+    expect(countTabs(3, sCode)).toEqual(1);
   });
 
   it("two line - two indents", () => {
-    const sCode = [["foo"], [TAB, TAB, "bar"]];
-    expect(countTabs(0, sCode)).toEqual(2);
+    expect(countTabs(6, sCode)).toEqual(2);
   });
 });

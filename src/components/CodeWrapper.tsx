@@ -253,7 +253,9 @@ const getCursorMovement = (
     }
     cursorPos.x -= offset === 0 ? curXStep : offset * curXStep;
   } else if (key === ENTER) {
-    const indentCount = countTabs(typed.currentWordId, sSplitCode);
+    const indentCount = countTabs(typed.currentWordId + 1, sSplitCode);
+    // const wordIdx = typed.currentWordId;
+    // console.log({ wordIdx, indentCount });
     cursorPos.y += curYStep;
     cursorPos.x = 2 * indentCount * curXStep;
     return cursorPos;
@@ -277,17 +279,19 @@ const getCursorMovement = (
  * @returns {number} number of consecutive tabs
  */
 const countTabs = (wordIdx: number, sSplitCode: string[][]): number => {
+  const lineLen = sSplitCode.length;
   let idx = 0;
   let count = 0;
-  for (let i = 0; i < sSplitCode.length; i++) {
+  for (let i = 0; i < lineLen; i++) {
     for (let j = 0; j < sSplitCode[i].length; j++) {
-      if (idx > wordIdx) break;
+      if (idx > wordIdx) {
+        i = lineLen;
+        break;
+      }
       if (idx === wordIdx && sSplitCode[i][j] === TAB) {
         idx++;
         count++;
         wordIdx++;
-      } else {
-        break;
       }
       if (sSplitCode[i][j] !== TAB) idx++;
     }
