@@ -315,7 +315,6 @@ const getNextId = (typed: Typed): number => {
  * Gets a new typed state when input is received
  * @param {string} key - keypress char
  * @param {Typed} typed - current typed state
- * @param {string} codeBlock - code block to be typed
  * @returns {Typed} the new typed state
  */
 const getNewTyped = (key: string, typed: Typed): Typed => {
