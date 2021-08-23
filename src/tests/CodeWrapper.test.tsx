@@ -19,6 +19,7 @@ const {
   backspaceIgnore,
   prevTypedCheck,
   enterIgnore,
+  countTabs,
 } = testing;
 
 describe("CodeWrapper", () => {
@@ -578,5 +579,30 @@ describe("enterIgnore", () => {
   it("end of line, new line with indent", () => {
     const sSplitCode = [["foo"], [TAB, "bar"]];
     expect(enterIgnore(0, sSplitCode)).toEqual(false);
+  });
+});
+
+/**
+ * countTabs
+ */
+describe("countTabs", () => {
+  it("one line - no indents", () => {
+    const sCode = [["foo", "bar"]];
+    expect(countTabs(0, sCode)).toEqual(0);
+  });
+
+  it("two line - no indents", () => {
+    const sCode = [["foo"], ["bar"]];
+    expect(countTabs(0, sCode)).toEqual(0);
+  });
+
+  it("two line - one indents", () => {
+    const sCode = [["foo"], [TAB, "bar"]];
+    expect(countTabs(0, sCode)).toEqual(1);
+  });
+
+  it("two line - two indents", () => {
+    const sCode = [["foo"], [TAB, TAB, "bar"]];
+    expect(countTabs(0, sCode)).toEqual(2);
   });
 });

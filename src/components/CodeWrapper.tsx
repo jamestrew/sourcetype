@@ -52,9 +52,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
    */
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    console.log(
-      ignoreInputCheck(event.key, sSplitCode, bSplitCode, typed, cursorPos)
-    );
     if (ignoreInputCheck(event.key, sSplitCode, bSplitCode, typed, cursorPos))
       return;
 
@@ -256,9 +253,9 @@ const getCursorMovement = (
     }
     cursorPos.x -= offset === 0 ? curXStep : offset * curXStep;
   } else if (key === ENTER) {
-    const nextWord = getWord(typed.currentWordId + 1, sSplitCode);
+    const indentCount = countTabs(typed.currentWordId, sSplitCode);
     cursorPos.y += curYStep;
-    cursorPos.x = nextWord !== TAB ? 0 : 2 * curXStep;
+    cursorPos.x = 2 * indentCount * curXStep;
     return cursorPos;
   } else {
     if (key === " ") {
@@ -271,6 +268,31 @@ const getCursorMovement = (
     }
   }
   return cursorPos;
+};
+
+/**
+ * Gets count of consecutive tabs following wordIdx
+ * @param {number} wordIdx - id of the word to splice out
+ * @param {string[][]} sSplitCode - nested list of words in the code snippet
+ * @returns {number} number of consecutive tabs
+ */
+const countTabs = (wordIdx: number, sSplitCode: string[][]): number => {
+  let idx = 0;
+  let count = 0;
+  for (let i = 0; i < sSplitCode.length; i++) {
+    for (let j = 0; j < sSplitCode[i].length; j++) {
+      if (idx > wordIdx) break;
+      if (idx === wordIdx && sSplitCode[i][j] === TAB) {
+        idx++;
+        count++;
+        wordIdx++;
+      } else {
+        break;
+      }
+      if (sSplitCode[i][j] !== TAB) idx++;
+    }
+  }
+  return count;
 };
 
 /**
@@ -305,7 +327,6 @@ const getNewTyped = (key: string, typed: Typed): Typed => {
   } else {
     let nextId = getNextId(typed);
     if (key === " ") nextId += 1;
-    // console.log({ nextId, typed });
     typed.current.push({ wordId: nextId, letter: key });
     typed.currentWordId = nextId;
   }
@@ -382,7 +403,7 @@ const getWord = (wordIdx: number, sSplitCode: string[][]): string | null => {
     for (let j = 0; j < sSplitCode[i].length; j++) {
       if (idx > wordIdx) break;
       if (idx === wordIdx) return sSplitCode[i][j];
-      idx++;
+      if (sSplitCode[i][j] !== TAB) idx++;
     }
   }
   return null;
@@ -405,4 +426,5 @@ export const testing = {
   prevTypedCheck,
   enterIgnore,
   ignoreInputCheck,
+  countTabs,
 };
