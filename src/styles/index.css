@@ -92,7 +92,7 @@ input {
 #cursor {
   @apply text-2xl m-1.5;
   @apply absolute origin-top-left;
-  height: 1em;
+  height: 1.5em;
   width: 2px;
   animation-name: cursorFlash;
   animation-iteration-count: infinite;
