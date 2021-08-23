@@ -6,7 +6,8 @@ import { TAB, BACKSPACE, ENTER } from "../utils/constants";
 const {
   curXStep,
   curYStep,
-  // cursorStart,
+  curXStart,
+  curYStart,
   getCursorMovement,
   getNewTyped,
   bisectWord,
@@ -15,12 +16,10 @@ const {
   getBareElements,
   getCursorOffset,
   getWord,
-  backspaceBypass,
+  backspaceIgnore,
   prevTypedCheck,
-  enterBypass,
+  enterIgnore,
 } = testing;
-
-const cursorStart = { x: 0, y: -0.2 };
 
 describe("CodeWrapper", () => {
   beforeEach(() => {
@@ -65,34 +64,18 @@ describe("CodeWrapper", () => {
  * getCursorMovement
  */
 describe("getCursorMovement", () => {
-  const codeBlockSimple = "foo bar baz";
-
-  it("backspace on start", () => {
-    const typedStart = { currentWordId: 0, current: [] };
-    const result = getCursorMovement(
-      BACKSPACE,
-      typedStart,
-      codeBlockSimple,
-      "foo",
-      "bar",
-      cursorStart
-    );
-    expect(result).toEqual(cursorStart);
-  });
+  const sSplitSimple = [["foo", "bar", "baz"]];
+  const bSplitSimple = ["foo", "bar", "baz"];
 
   it("enter letter at start", () => {
     const typedStart = { currentWordId: 0, current: [] };
-    const expected = { x: cursorStart.x + curXStep, y: cursorStart.y };
+    const expected = { x: curXStart + curXStep, y: curYStart };
     const result = getCursorMovement(
       "r",
       typedStart,
-      codeBlockSimple,
-      "foo",
-      "bar",
-      {
-        x: cursorStart.x,
-        y: cursorStart.y,
-      }
+      sSplitSimple,
+      bSplitSimple,
+      { x: curXStart, y: curYStart }
     );
     expect(result).toEqual(expected);
   });
@@ -102,23 +85,20 @@ describe("getCursorMovement", () => {
       currentWordId: 0,
       current: [{ wordId: 0, letter: "i" }],
     };
-    const curCurrent = { x: cursorStart.x + curXStep, y: cursorStart.y };
+    const curCurrent = { x: curXStart + curXStep, y: curYStart };
     const result = getCursorMovement(
       BACKSPACE,
       typedStart,
-      codeBlockSimple,
-      "foo",
-      "bar",
+      sSplitSimple,
+      bSplitSimple,
       curCurrent
     );
-    expect(result.x).toBeCloseTo(cursorStart.x);
-    expect(result.y).toBeCloseTo(cursorStart.y);
+    expect(result.x).toBeCloseTo(curXStart);
+    expect(result.y).toBeCloseTo(curYStart);
   });
 
-  // need to check the next word in wordList but maybe should simplify the args
-  // for getCursorMovement first
   it("New line - no indentation", () => {
-    const expected = { x: cursorStart.x, y: cursorStart.y + curYStep };
+    const expected = { x: curXStart, y: curYStart + curYStep };
     const typedStart = {
       currentWordId: 0,
       current: [
@@ -127,22 +107,21 @@ describe("getCursorMovement", () => {
         { wordId: 0, letter: "o" },
       ],
     };
-    const codeBlock = `
-foo
-boo
- `;
-    const result = getCursorMovement(ENTER, typedStart, codeBlock, "foo", "", {
-      x: cursorStart.x + 3 * curXStep,
-      y: cursorStart.y,
-    });
+    const sSplit = [["foo"], ["bar"]];
+    const bSplit = ["foo", "bar"];
+    const cursor = {
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    };
+    const result = getCursorMovement(ENTER, typedStart, sSplit, bSplit, cursor);
     expect(result.x).toBeCloseTo(expected.x);
     expect(result.y).toBeCloseTo(expected.y);
   });
 
   it("New line - autoindent", () => {
     const expected = {
-      x: cursorStart.x + 2 * curXStep,
-      y: cursorStart.y + curYStep,
+      x: curXStart + 2 * curXStep,
+      y: curYStart + curYStep,
     };
     const typedStart = {
       currentWordId: 0,
@@ -152,110 +131,24 @@ boo
         { wordId: 0, letter: "o" },
       ],
     };
-    const codeBlock = `
-foo
-  boo
- `;
-    const result = getCursorMovement(ENTER, typedStart, codeBlock, "foo", TAB, {
-      x: cursorStart.x + 3 * curXStep,
-      y: cursorStart.y,
-    });
+    const sSplit = [["foo"], [TAB, "bar"]];
+    const bSplit = ["foo", "bar"];
+    const cursor = {
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    };
+    const result = getCursorMovement(ENTER, typedStart, sSplit, bSplit, cursor);
     expect(result.x).toBeCloseTo(expected.x);
     expect(result.y).toBeCloseTo(expected.y);
   });
-
-  it("New line - backspace immediately", () => {
-    const expected = {
-      x: cursorStart.x,
-      y: cursorStart.y + curYStep,
-    };
-    const typedStart = {
-      currentWordId: 1,
-      current: [
-        { wordId: 0, letter: "f" },
-        { wordId: 0, letter: "o" },
-        { wordId: 0, letter: "o" },
-      ],
-    };
-    const codeBlock = `
-foo
-boo
- `;
-    const result = getCursorMovement(
-      BACKSPACE,
-      typedStart,
-      codeBlock,
-      "foo",
-      "boo",
-      {
-        x: cursorStart.x,
-        y: cursorStart.y + curYStep,
-      }
-    );
-    expect(result.x).toBeCloseTo(expected.x);
-    expect(result.y).toBeCloseTo(expected.y);
-  });
-
-  it("New line autoindented - backspace immediately", () => {
-    const expected = {
-      x: cursorStart.x + 2 * curXStep,
-      y: cursorStart.y + curYStep,
-    };
-    const typedStart = {
-      currentWordId: 1,
-      current: [
-        { wordId: 0, letter: "f" },
-        { wordId: 0, letter: "o" },
-        { wordId: 0, letter: "o" },
-      ],
-    };
-    const codeBlock = `
-foo
-  boo
- `;
-    const result = getCursorMovement(
-      BACKSPACE,
-      typedStart,
-      codeBlock,
-      TAB,
-      "boo",
-      {
-        x: cursorStart.x + 2 * curXStep,
-        y: cursorStart.y + curYStep,
-      }
-    );
-    expect(result.x).toBeCloseTo(expected.x);
-    expect(result.y).toBeCloseTo(expected.y);
-  });
-
-  it.todo("space mid word jump to next word");
 });
 
 /**
  * getNewTyped
  */
 describe("getNewTyped", () => {
-  const codeBlockSimple = "foo bar baz";
-  const typedStart: Typed = {
-    currentWordId: 0,
-    current: [],
-  };
-
-  it("backspace on start", () => {
-    const next = getNewTyped(
-      BACKSPACE,
-      { currentWordId: 0, current: [] },
-      codeBlockSimple
-    );
-    expect(next).toEqual(typedStart);
-  });
-
   it("single letter from start", () => {
-    const next = getNewTyped(
-      "a",
-      { currentWordId: 0, current: [] },
-      codeBlockSimple
-    );
+    const next = getNewTyped("a", { currentWordId: 0, current: [] });
     const result = {
       currentWordId: 0,
       current: [{ wordId: 0, letter: "a" }],
@@ -264,18 +157,14 @@ describe("getNewTyped", () => {
   });
 
   it("backspace on letter", () => {
-    const next = getNewTyped(
-      BACKSPACE,
-      {
-        currentWordId: 0,
-        current: [
-          { wordId: 0, letter: "i" },
-          { wordId: 0, letter: "n" },
-          { wordId: 0, letter: "t" },
-        ],
-      },
-      codeBlockSimple
-    );
+    const next = getNewTyped(BACKSPACE, {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "n" },
+        { wordId: 0, letter: "t" },
+      ],
+    });
     const result = {
       currentWordId: 0,
       current: [
@@ -297,20 +186,16 @@ describe("getNewTyped", () => {
     };
 
     for (let i = 0; i < 9; ++i) {
-      next = getNewTyped("o", next, codeBlockSimple);
+      next = getNewTyped("o", next);
     }
     expect(next).toEqual(result);
   });
 
   it("space increments wordId", () => {
-    const next = getNewTyped(
-      " ",
-      {
-        currentWordId: 0,
-        current: [],
-      },
-      codeBlockSimple
-    );
+    const next = getNewTyped(" ", {
+      currentWordId: 0,
+      current: [],
+    });
     const result = {
       currentWordId: 1,
       current: [{ wordId: 1, letter: " " }],
@@ -318,7 +203,7 @@ describe("getNewTyped", () => {
     expect(next).toEqual(result);
   });
 
-  it("overflow limiter simple", () => {
+  it.skip("overflow limiter simple", () => {
     const overflow_limit = 10;
     const result: Typed = {
       currentWordId: 0,
@@ -333,16 +218,16 @@ describe("getNewTyped", () => {
       currentWordId: 0,
       current: [],
     };
-    next = getNewTyped("f", next, codeBlockSimple);
-    next = getNewTyped("o", next, codeBlockSimple);
-    next = getNewTyped("o", next, codeBlockSimple);
+    next = getNewTyped("f", next);
+    next = getNewTyped("o", next);
+    next = getNewTyped("o", next);
     for (let i = 0; i < overflow_limit + 3; ++i) {
-      next = getNewTyped("o", next, codeBlockSimple);
+      next = getNewTyped("o", next);
     }
     expect(next).toEqual(result);
   });
 
-  it("overflow limiter newline", () => {
+  it.skip("overflow limiter newline", () => {
     const overflow_limit = 10;
     const result: Typed = {
       currentWordId: 0,
@@ -357,19 +242,15 @@ describe("getNewTyped", () => {
       currentWordId: 0,
       current: [],
     };
-    next = getNewTyped("f", next, "\nfoo\n");
-    next = getNewTyped("o", next, "\nfoo\n");
-    next = getNewTyped("o", next, "\nfoo\n");
+    next = getNewTyped("f", next);
+    next = getNewTyped("o", next);
+    next = getNewTyped("o", next);
     for (let i = 0; i < overflow_limit + 3; ++i) {
-      next = getNewTyped("o", next, "\nfoo\n");
+      next = getNewTyped("o", next);
     }
     expect(next).toEqual(result);
   });
 
-  it.todo("enter on start");
-  it.todo("enter skips multiple words");
-  it.todo("enter at end-of-line");
-  it.todo("many backspaces after new line");
   it.todo("goto next word on enter");
 });
 
@@ -514,20 +395,20 @@ describe("getCursorOffset", () => {
       currentWordId: 0,
       current: [],
     };
-    expect(getCursorOffset(next, "foo bar")).toEqual(3);
+    expect(getCursorOffset(next, ["foo", "bar"])).toEqual(3);
   });
 
   it("no offset", () => {
-    expect(getCursorOffset(typed, "foo bar")).toEqual(0);
+    expect(getCursorOffset(typed, ["foo", "bar"])).toEqual(0);
   });
 
   it("simple offset", () => {
-    expect(getCursorOffset(typed, "foo barbaz")).toEqual(3);
+    expect(getCursorOffset(typed, ["foo", "barbaz"])).toEqual(3);
   });
 
   it("simple offset with enter", () => {
     typed.current.splice(3, 1, { wordId: 1, letter: "\n" });
-    expect(getCursorOffset(typed, "foo\nbarbaz")).toEqual(3);
+    expect(getCursorOffset(typed, ["foo", "barbaz"])).toEqual(3);
   });
 });
 
@@ -579,19 +460,35 @@ describe("getWord", () => {
 });
 
 /**
- * backspaceBypass
+ * backspaceignore
  */
-describe("backspaceBypass", () => {
+describe("backspaceignore", () => {
   it("cursor at start", () => {
-    expect(backspaceBypass(cursorStart.x, true)).toEqual(false);
+    const typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    expect(backspaceIgnore(curXStart, typed, ["foo"])).toEqual(true);
   });
 
   it("cursor not at start, prev typed right", () => {
-    expect(backspaceBypass(cursorStart.x + curXStep, true)).toEqual(false);
+    const typed = {
+      currentWordId: 1,
+      current: [{ wordId: 0, letter: "a" }],
+    };
+    expect(backspaceIgnore(curXStart + curXStep, typed, ["a", "b"])).toEqual(
+      true
+    );
   });
 
   it("cursor not at start, prev typed wrong", () => {
-    expect(backspaceBypass(cursorStart.x + curXStep, false)).toEqual(true);
+    const typed = {
+      currentWordId: 1,
+      current: [{ wordId: 0, letter: "b" }],
+    };
+    expect(backspaceIgnore(curXStart + curXStep, typed, ["a", "b"])).toEqual(
+      false
+    );
   });
 });
 
@@ -660,16 +557,26 @@ describe("prevTypedCheck", () => {
 });
 
 /**
- * enterBypass
+ * enterIgnore
  */
-describe("enterBypass", () => {
+describe("enterIgnore", () => {
   it("mid line", () => {
     const sSplitCode = [["foo", "bar"]];
-    expect(enterBypass(0, sSplitCode)).toEqual(true);
+    expect(enterIgnore(0, sSplitCode)).toEqual(true);
   });
 
-  it("end of line", () => {
+  it("end of line, no new line", () => {
     const sSplitCode = [["foo", "bar"]];
-    expect(enterBypass(1, sSplitCode)).toEqual(true);
+    expect(enterIgnore(1, sSplitCode)).toEqual(false);
+  });
+
+  it("end of line, new line", () => {
+    const sSplitCode = [["foo"], ["bar"]];
+    expect(enterIgnore(0, sSplitCode)).toEqual(false);
+  });
+
+  it("end of line, new line with indent", () => {
+    const sSplitCode = [["foo"], [TAB, "bar"]];
+    expect(enterIgnore(0, sSplitCode)).toEqual(false);
   });
 });
