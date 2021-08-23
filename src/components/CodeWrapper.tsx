@@ -168,7 +168,8 @@ const ignoreInputCheck = (
   } else {
     const currentTypedLen = getCurrentTyped(typed).length;
     const currentWordLen = bSplitCode[typed.currentWordId].length;
-    if (currentWordLen + OVERFLOW_LIMIT <= currentTypedLen) return true;
+    if (key !== " " && currentWordLen + OVERFLOW_LIMIT <= currentTypedLen)
+      return true;
   }
   return false;
 };
