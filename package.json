@@ -15,10 +15,11 @@
         "web-vitals": "^1.0.1"
     },
     "scripts": {
-        "start": "craco start",
-        "build": "craco build",
-        "test": "craco test --verbose --passWithNoTests",
-        "eject": "react-scripts eject"
+        "start:react": "craco start",
+        "build:react": "craco build",
+        "test:react": "craco test --verbose --passWithNoTests",
+        "eject:src": "react-scripts eject",
+        "start:server": "ts-node ./server/src/index.ts"
     },
     "eslintConfig": {
         "extends": [
