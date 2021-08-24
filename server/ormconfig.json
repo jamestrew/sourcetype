@@ -7,12 +7,12 @@
     "database": "sourcetype_dev",
     "synchronize": true,
     "logging": false,
-    "entities": ["src/entity/**/*.ts"],
-    "migrations": ["src/migration/**/*.ts"],
-    "subscribers": ["src/subscriber/**/*.ts"],
+    "entities": ["server/src/entity/**/*.ts"],
+    "migrations": ["server/src/migration/**/*.ts"],
+    "subscribers": ["server/src/subscriber/**/*.ts"],
     "cli": {
-        "entitiesDir": "src/entity",
-        "migrationsDir": "src/migration",
-        "subscribersDir": "src/subscriber"
+        "entitiesDir": "server/src/entity",
+        "migrationsDir": "server/src/migration",
+        "subscribersDir": "server/src/subscriber"
     }
 }
