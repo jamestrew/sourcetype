@@ -16,7 +16,5 @@
         "type-graphql": "^1.1.1",
         "typeorm": "0.2.37"
     },
-    "scripts": {
-        "start": "ts-node src/index.ts"
-    }
+    "scripts": {}
 }

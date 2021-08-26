@@ -34,3 +34,15 @@ const main = async () => {
 main().catch((err) => {
   console.log(err);
 });
+
+/*
+
+https://github.com/JCMais/node-libcurl
+
+sourcegraph graphql api via curl
+curl \
+-H 'Authorization: token 12f7775cb0e0af9e9847ae136ed234c0a0e8a409' \
+-d '{"query": "query {repositories(first: 10) { nodes { name description url } }}"}' \
+https://sourcegraph.com/.api/graphql
+
+*/
