@@ -1,0 +1,13 @@
+overwrite: true
+schema: "https://sourcegraph.com/.api/graphql"
+documents: "server/src/gql/*.graphql"
+generates:
+  /server/src/generated/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-resolvers"
+      - "typescript-react-apollo"
+  ./graphql.schema.json:
+    plugins:
+      - "introspection"
