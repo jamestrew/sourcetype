@@ -59,6 +59,9 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
       getCursorMovement(event.key, typed, sSplitCode, bSplitCode, cursorPos)
     );
     setTyped(getNewTyped(event.key, typed));
+    if (bSplitCode.filter((i) => i !== "").length === typed.currentWordId) {
+      console.log("Reached the end");
+    }
   };
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {
