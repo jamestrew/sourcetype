@@ -1,9 +1,0 @@
-query testquery($first: Int!) {
-  repositories(first: $first) {
-    nodes {
-      name
-      description
-      url
-    }
-  }
-}
