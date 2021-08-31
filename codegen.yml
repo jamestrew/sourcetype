@@ -1,5 +1,5 @@
 overwrite: true
-schema: "https://sourcegraph.com/.api/graphql"
+schema: "https://localhost:8000"
 documents: "src/gql/*.graphql"
 generates:
   /server/src/generated/graphql.tsx:
