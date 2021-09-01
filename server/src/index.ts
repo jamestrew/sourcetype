@@ -10,6 +10,8 @@ const main = async () => {
   const connection = await createConnection();
   const app = express();
 
+  await connection.runMigrations();
+
   const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({
     resolvers: [HelloResolver],
   });
@@ -21,16 +23,6 @@ const main = async () => {
 
   await server.start();
   server.applyMiddleware({ app });
-
-  app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin,X-Requested-With,Content-Type,Accept"
-    );
-    next();
-  });
 
   app.get("/", (_, res) => {
     res.send("hello");
