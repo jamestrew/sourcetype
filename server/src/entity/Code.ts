@@ -13,10 +13,10 @@ export class Code {
   id: number;
 
   @Column()
-  repo_url!: string;
+  repoUrl!: string;
 
   @Column()
-  line_url!: string; // eg. https://github.com/trewjames/sourcetype/blob/2f2420286f4e555e1715af286e4843eab5a92ea0/src/index.tsx#L7
+  lineUrl!: string; // eg. https://github.com/trewjames/sourcetype/blob/2f2420286f4e555e1715af286e4843eab5a92ea0/src/index.tsx#L7
 
   @PrimaryColumn("text")
   snippet!: string;

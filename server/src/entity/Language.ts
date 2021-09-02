@@ -12,10 +12,10 @@ export class Language {
   id: number;
 
   @PrimaryColumn()
-  language_name!: string;
+  name!: string;
 
   @PrimaryColumn()
-  language_ext!: string;
+  ext!: string;
 
   @OneToMany(() => Code, (snippets) => snippets.language)
   snippets: Code[];
