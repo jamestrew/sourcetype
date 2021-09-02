@@ -25,7 +25,6 @@ export class langs1630548226116 implements MigrationInterface {
       insert into language (name, ext) values ('elixir', 'ex');
       insert into language (name, ext) values ('scala', 'scala');
       insert into language (name, ext) values ('perl', 'pl');
-      insert into language (name, ext) values ('rust', 'rs');
       `);
   }
 

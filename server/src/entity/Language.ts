@@ -2,8 +2,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
-  PrimaryColumn,
   BaseEntity,
+  Column,
 } from "typeorm";
 import { Code } from "./Code";
 
@@ -12,10 +12,10 @@ export class Language extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn()
+  @Column({ unique: true })
   name!: string;
 
-  @PrimaryColumn()
+  @Column({ unique: true })
   ext!: string;
 
   @OneToMany(() => Code, (snippets) => snippets.language)
