@@ -4,11 +4,12 @@ import {
   Column,
   ManyToOne,
   PrimaryColumn,
+  BaseEntity,
 } from "typeorm";
 import { Language } from "./Language";
 
 @Entity()
-export class Code {
+export class Code extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

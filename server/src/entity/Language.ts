@@ -3,11 +3,12 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   PrimaryColumn,
+  BaseEntity,
 } from "typeorm";
 import { Code } from "./Code";
 
 @Entity()
-export class Language {
+export class Language extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
