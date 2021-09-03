@@ -4,8 +4,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  PrimaryColumn,
   BaseEntity,
+  JoinColumn,
 } from "typeorm";
 import { Language } from "./Language";
 
@@ -18,16 +18,18 @@ export class Code extends BaseEntity {
 
   @Field()
   @Column()
-  repoUrl!: string;
+  repo!: string;
 
   @Field()
   @Column()
-  lineUrl!: string; // eg. https://github.com/trewjames/sourcetype/blob/2f2420286f4e555e1715af286e4843eab5a92ea0/src/index.tsx#L7
+  permalink!: string; // eg. https://github.com/trewjames/sourcetype/blob/2f2420286f4e555e1715af286e4843eab5a92ea0/src/index.tsx#L7
 
   @Field()
   @Column("text", { unique: true })
   snippet!: string;
 
-  @ManyToOne(() => Language, (language) => language.snippets)
-  language: Language;
+  @Field()
+  @ManyToOne(() => Language, (language) => language.codes)
+  @JoinColumn({ name: "language_id" })
+  language!: Language;
 }
