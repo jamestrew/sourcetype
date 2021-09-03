@@ -4,6 +4,7 @@ import "reflect-metadata";
 import { createConnection } from "typeorm";
 import { buildTypeDefsAndResolvers } from "type-graphql";
 import { CodeResolver } from "./resolvers/code";
+import { LanguageResolver } from "./resolvers/language";
 
 const main = async () => {
   const connection = await createConnection();
@@ -12,7 +13,7 @@ const main = async () => {
   await connection.runMigrations();
 
   const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({
-    resolvers: [CodeResolver],
+    resolvers: [CodeResolver, LanguageResolver],
   });
 
   const server = new ApolloServer({
