@@ -1,6 +1,5 @@
 import { Arg, Query, Resolver } from "type-graphql";
 import { Language } from "../entity/Language";
-import { getConnection } from "typeorm";
 
 @Resolver()
 export class LanguageResolver {

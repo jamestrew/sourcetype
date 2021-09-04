@@ -1,10 +1,10 @@
 import { Field, ObjectType } from "type-graphql";
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
   BaseEntity,
   Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { Code } from "./Code";
 
