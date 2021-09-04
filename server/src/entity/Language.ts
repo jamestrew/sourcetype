@@ -1,22 +1,28 @@
+import { Field, ObjectType } from "type-graphql";
 import {
+  BaseEntity,
+  Column,
   Entity,
-  PrimaryGeneratedColumn,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { Code } from "./Code";
 
+@ObjectType()
 @Entity()
-export class Language {
+export class Language extends BaseEntity {
+  @Field()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn()
-  language_name!: string;
+  @Field()
+  @Column({ unique: true })
+  name!: string;
 
-  @PrimaryColumn()
-  language_ext!: string;
+  @Field()
+  @Column({ unique: true })
+  ext!: string;
 
-  @OneToMany(() => Code, (snippets) => snippets.language)
-  snippets: Code[];
+  @OneToMany(() => Code, (code) => code.language)
+  codes: Code[];
 }

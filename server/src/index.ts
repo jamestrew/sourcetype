@@ -2,9 +2,9 @@ import { ApolloServer } from "apollo-server-express";
 import express = require("express");
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-// import { User } from "./entity/User";
 import { buildTypeDefsAndResolvers } from "type-graphql";
-import { HelloResolver } from "./resolvers/hello";
+import { CodeResolver } from "./resolvers/code";
+import { LanguageResolver } from "./resolvers/language";
 
 const main = async () => {
   const connection = await createConnection();
@@ -13,7 +13,7 @@ const main = async () => {
   await connection.runMigrations();
 
   const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({
-    resolvers: [HelloResolver],
+    resolvers: [CodeResolver, LanguageResolver],
   });
 
   const server = new ApolloServer({
