@@ -1,0 +1,11 @@
+query randCodeByLang($language_id: Float!) {
+  randCodeByLang(language_id: $language_id) {
+    repo
+    permalink
+    snippet
+    language {
+      name
+      ext
+    }
+  }
+}
