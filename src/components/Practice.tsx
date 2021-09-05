@@ -1,16 +1,17 @@
 import { FC } from "react";
 import { CodeWrapper } from "./CodeWrapper";
 import { TAB } from "../utils/constants";
+import { useRandCodeByLangQuery } from "generated/graphql";
 
 export const Practice: FC = () => {
-  const code = `
-if (true) {
-  if (bar) {
-    return 'foo'
-  }
-}
-  `;
+  const { data, loading, error } = useRandCodeByLangQuery({
+    variables: {
+      language_id: 2,
+    },
+  });
+  console.log({ data, loading, error });
 
+  const code = data?.randCodeByLang.snippet ?? "";
   const sSplitCode = smartSplit(code);
   const bSplitCode = code.trim().split(/[\n ]/);
 

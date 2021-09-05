@@ -1,0 +1,7 @@
+query languages {
+  languages {
+    id
+    name
+    ext
+  }
+}
