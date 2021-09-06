@@ -1,12 +1,13 @@
-import { FC } from "react";
+import { BaseSyntheticEvent, FC, useState } from "react";
 import { CodeWrapper } from "./CodeWrapper";
 import { TAB } from "../utils/constants";
 import { useRandCodeByLangQuery } from "generated/graphql";
 
 export const Practice: FC = () => {
+  const [langId, setLangId] = useState(-1);
   const { data, loading, error } = useRandCodeByLangQuery({
     variables: {
-      language_id: 2,
+      language_id: langId,
     },
   });
   console.log({ data, loading, error });
@@ -15,8 +16,22 @@ export const Practice: FC = () => {
   const sSplitCode = smartSplit(code);
   const bSplitCode = code.trim().split(/[\n ]/);
 
+  const langChange = (e: BaseSyntheticEvent) => {
+    setLangId(Number(e.target.value));
+  };
+
   return (
     <main>
+      <div>
+        <form action="post">
+          <label htmlFor="language">Select Language: </label>
+          <select id="language" name="language" onChange={langChange}>
+            <option value="1">Typescript</option>
+            <option value="2">Typescript React</option>
+            <option value="3">Python</option>
+          </select>
+        </form>
+      </div>
       <CodeWrapper sSplitCode={sSplitCode} bSplitCode={bSplitCode} />
     </main>
   );
