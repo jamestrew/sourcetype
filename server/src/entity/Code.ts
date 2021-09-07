@@ -25,6 +25,10 @@ export class Code extends BaseEntity {
   permalink!: string; // eg. https://github.com/trewjames/sourcetype/blob/2f2420286f4e555e1715af286e4843eab5a92ea0/src/index.tsx#L7
 
   @Field()
+  @Column()
+  tabsize!: number;
+
+  @Field()
   @Column("text", { unique: true })
   snippet!: string;
 
