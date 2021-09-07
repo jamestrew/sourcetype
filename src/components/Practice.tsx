@@ -14,7 +14,6 @@ export const Practice: FC = () => {
     variables: {},
   });
 
-  console.log(codeQuery.data?.randCodeByLang);
   const code = codeQuery.data?.randCodeByLang.snippet ?? "";
   const sSplitCode = smartSplit(code);
   const bSplitCode = code.trim().split(/[\n ]/);
