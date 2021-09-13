@@ -41,12 +41,14 @@ export const Practice: FC = () => {
             ))}
           </select>
         </form>
-        <button
-          className="flex items-center px-5 justify-center rounded-md dark:bg-gray-900"
-          onClick={() => codeQuery.refetch()}
-        >
-          <BiShuffle />
-        </button>
+        <div className="flex items-center">
+          <button
+            className="items-center px-2 py-2 rounded-md dark:bg-gray-900"
+            onClick={() => codeQuery.refetch()}
+          >
+            <BiShuffle />
+          </button>
+        </div>
       </div>
       <CodeWrapper sSplitCode={sSplitCode} bSplitCode={bSplitCode} />
     </main>
