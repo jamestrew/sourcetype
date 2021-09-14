@@ -17,7 +17,7 @@ export type Typed = {
   }[];
 };
 
-type CursorPos = {
+export type CursorPos = {
   x: number;
   y: number;
 };
@@ -45,11 +45,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   const [focusWarning, setFocusWarning] = useState<FocusWarning>("hidden");
   const [blurred, setBlurred] = useState<Blurred>("");
 
-  /**
-   * Updates the state of CodeWrapper onKeyPress
-   * @listens KeyboardEvent
-   * @param {KeyboardEvent<HTMLInputElement>} event
-   */
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     if (ignoreInputCheck(event.key, sSplitCode, bSplitCode, typed, cursorPos))
@@ -111,7 +106,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
                   <Word
                     key={i}
                     text={wd}
-                    value={getBareElements(bisectWord(i, typed)).split("")}
+                    value={stringifyTyped(bisectTyped(i, typed)).split("")}
                     isComplete={isWordComplete(i, typed)}
                   />
                 );
@@ -126,7 +121,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
           data-testid="codeInput"
           ref={focusInputRef}
           tabIndex={0}
-          defaultValue={getBareElements(getCurrentTyped(typed))}
+          defaultValue={stringifyTyped(getCurrentTyped(typed))}
           autoComplete="off"
           onKeyPress={handleKeyPress}
           onKeyDown={(e) => e.key === BACKSPACE && handleKeyPress(e)}
@@ -183,7 +178,7 @@ const ignoreInputCheck = (
 const prevTypedCheck = (typed: Typed, bSplitCode: string[]): boolean => {
   if (typed.current.length === 0) return true;
   const prevTypedId = typed.currentWordId - 1;
-  const prevTyped = getBareElements(bisectWord(prevTypedId, typed));
+  const prevTyped = stringifyTyped(bisectTyped(prevTypedId, typed));
   if (bSplitCode[prevTypedId] === prevTyped) return true;
   return false;
 };
@@ -255,8 +250,6 @@ const getCursorMovement = (
     cursorPos.x -= offset === 0 ? curXStep : offset * curXStep;
   } else if (key === ENTER) {
     const indentCount = countTabs(typed.currentWordId + 1, sSplitCode);
-    // const wordIdx = typed.currentWordId;
-    // console.log({ wordIdx, indentCount });
     cursorPos.y += curYStep;
     cursorPos.x = 2 * indentCount * curXStep;
     return cursorPos;
@@ -343,7 +336,7 @@ const getNewTyped = (key: string, typed: Typed): Typed => {
  * @param {Typed} typed - current typed state
  * @returns {Typed["current"]} word with id of wordId
  */
-const bisectWord = (wordId: number, typed: Typed): Typed["current"] => {
+const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
   let result: Typed["current"] = [];
   let [lo, hi] = [wordId, typed.current.length];
 
@@ -383,7 +376,7 @@ const isWordComplete = (wordId: number, typed: Typed): boolean => {
  * @returns {Typed["current"]} the currently typed word
  */
 const getCurrentTyped = (typed: Typed): Typed["current"] => {
-  return bisectWord(typed.currentWordId, typed);
+  return bisectTyped(typed.currentWordId, typed);
 };
 
 /**
@@ -391,7 +384,7 @@ const getCurrentTyped = (typed: Typed): Typed["current"] => {
  * @param {Typed["current"]} input - a typed state
  * @returns {string} the given state
  */
-const getBareElements = (input: Typed["current"]): string => {
+const stringifyTyped = (input: Typed["current"]): string => {
   return input.map((i) => i.letter).reduce((r, i) => r + i, "");
 };
 
@@ -420,10 +413,10 @@ export const testing = {
   curYStart,
   getCursorMovement,
   getNewTyped,
-  bisectWord,
+  bisectTyped,
   isWordComplete,
   getCurrentTyped,
-  getBareElements,
+  stringifyTyped,
   getCursorOffset,
   getWord,
   backspaceIgnore,

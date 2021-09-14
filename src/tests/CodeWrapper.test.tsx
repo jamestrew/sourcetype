@@ -10,10 +10,10 @@ const {
   curYStart,
   getCursorMovement,
   getNewTyped,
-  bisectWord,
+  bisectTyped,
   isWordComplete,
   getCurrentTyped,
-  getBareElements,
+  stringifyTyped,
   getCursorOffset,
   getWord,
   backspaceIgnore,
@@ -336,16 +336,13 @@ describe("getNewTyped", () => {
   it.todo("goto next word on enter");
 });
 
-/**
- * bisectWord
- */
-describe("bisectWord", () => {
+describe("bisectTyped", () => {
   it("initial state", () => {
     const next = {
       currentWordId: 0,
       current: [],
     };
-    const word = bisectWord(0, next);
+    const word = bisectTyped(0, next);
     expect(word).toEqual([]);
   });
 
@@ -354,8 +351,8 @@ describe("bisectWord", () => {
       currentWordId: 0,
       current: [],
     };
-    expect(bisectWord(-1, next)).toEqual([]);
-    expect(bisectWord(1, next)).toEqual([]);
+    expect(bisectTyped(-1, next)).toEqual([]);
+    expect(bisectTyped(1, next)).toEqual([]);
   });
 
   it("middle fetch", () => {
@@ -365,12 +362,18 @@ describe("bisectWord", () => {
         { wordId: 0, letter: "a" },
         { wordId: 1, letter: " " },
         { wordId: 1, letter: "b" },
+        { wordId: 1, letter: "a" },
+        { wordId: 1, letter: "r" },
         { wordId: 2, letter: " " },
         { wordId: 2, letter: "c" },
       ],
     };
-    const word = bisectWord(1, next);
-    expect(word).toEqual([{ wordId: 1, letter: "b" }]);
+    const word = bisectTyped(1, next);
+    expect(word).toEqual([
+      { wordId: 1, letter: "b" },
+      { wordId: 1, letter: "a" },
+      { wordId: 1, letter: "r" },
+    ]);
   });
 });
 
@@ -426,16 +429,13 @@ describe("getLastWord", () => {
   });
 });
 
-/**
- * getBareElements
- */
-describe("getBareElements", () => {
+describe("stringifyTyped", () => {
   it("initial state", () => {
     const next = {
       currentWordId: 0,
       current: [],
     };
-    expect(getBareElements(next.current)).toEqual("");
+    expect(stringifyTyped(next.current)).toEqual("");
   });
 
   it("reduction of entire state", () => {
@@ -451,7 +451,7 @@ describe("getBareElements", () => {
         { wordId: 1, letter: "r" },
       ],
     };
-    expect(getBareElements(next.current)).toEqual("foo bar");
+    expect(stringifyTyped(next.current)).toEqual("foo bar");
   });
 });
 
