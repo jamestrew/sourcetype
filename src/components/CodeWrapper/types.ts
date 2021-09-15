@@ -2,6 +2,9 @@ export interface IKeyHandler {
   ignoreInput(): boolean;
   getCursorPos(): CursorPos;
   getTyped(): Typed;
+  handleKey(): void;
+  newCursorPos: CursorPos;
+  newTyped: Typed;
 }
 
 export type KeyHandlerArgs = {

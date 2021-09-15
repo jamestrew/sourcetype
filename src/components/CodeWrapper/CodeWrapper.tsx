@@ -47,8 +47,11 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
       tabSize,
     });
 
-    setCursorPos(keyHandler.getCursorPos);
-    setTyped(keyHandler.getTyped);
+    if (keyHandler.ignoreInput()) return;
+    keyHandler.handleKey();
+
+    setCursorPos(keyHandler.newCursorPos);
+    setTyped(keyHandler.newTyped);
   };
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {

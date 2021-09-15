@@ -12,6 +12,7 @@ class KeyHandler implements IKeyHandler {
   sSplit: string[][];
   bSplit: string[];
   tabSize: number;
+  private results: { cursorPos: CursorPos; typed: Typed } | null;
 
   constructor(args: KeyHandlerArgs) {
     this.key = args.key;
@@ -20,6 +21,7 @@ class KeyHandler implements IKeyHandler {
     this.sSplit = args.sSplit;
     this.bSplit = args.bSplit;
     this.tabSize = args.tabSize;
+    this.results = null;
   }
 
   ignoreInput(): boolean {
@@ -39,6 +41,24 @@ class KeyHandler implements IKeyHandler {
       letter: this.key,
     });
     return { ...this.typed };
+  }
+
+  handleKey(): void {
+    // deterministic call order
+    this.results = {
+      cursorPos: this.getCursorPos(),
+      typed: this.getTyped(),
+    };
+  }
+
+  get newCursorPos(): CursorPos {
+    if (!this.results) throw new Error("New cursor not determined");
+    return this.results.cursorPos;
+  }
+
+  get newTyped(): Typed {
+    if (!this.results) throw new Error("New typed not determined");
+    return this.results.typed;
   }
 
   get prevTypedCorrectly(): boolean {
