@@ -1,13 +1,10 @@
 import { Typed, CursorPos } from "../components/CodeWrapper";
-import { SPACE, BACKSPACE, ENTER } from "../utils/constants";
+import { SPACE, TAB, BACKSPACE, ENTER } from "../utils/constants";
 
 interface IKeyHandler {
   ignoreInput(): boolean;
   getCursorPos(): CursorPos;
   getTyped(): Typed;
-  prevTypedCorrectly(): boolean;
-  getWordId(): number;
-  getCursorOffset(): number;
 }
 
 const curXStep = 0.582;
@@ -15,6 +12,7 @@ const curYStep = 1.875;
 const curXStart = 0;
 const curYStart = -0.2;
 const OVERFLOW_LIMIT = 10;
+let tabSize = 2;
 
 export class KeyHandler implements IKeyHandler {
   key: string;
@@ -40,7 +38,11 @@ export class KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
     if (this.key === SPACE || this.key === BACKSPACE || this.key === ENTER)
       throw new Error(`${this.key} being handled by base KeyHandler`);
-    return false;
+
+    // BUG: these won't aways match up (check out bSplit, too many empty strings)
+    const currentTypedLen = getCurrentTyped(this.typed).length;
+    const currentWordLen = this.bSplit[this.typed.currentWordId].length;
+    return currentWordLen + OVERFLOW_LIMIT <= currentTypedLen;
   }
 
   getCursorPos(): CursorPos {
@@ -75,11 +77,32 @@ export class KeyHandler implements IKeyHandler {
     const currentTypedLength = getCurrentTyped(this.typed).length;
     return Math.max(0, currentWordLength, currentTypedLength);
   }
+
+  atEndofLine(): boolean {
+    let wordIdx = 0;
+    for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
+      for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
+        if (wordIdx > this.typed.currentWordId) return true;
+        if (
+          this.typed.currentWordId === wordIdx &&
+          wordNum === this.sSplit[lineNum].length - 1
+        )
+          return false;
+        if (this.sSplit[lineNum][wordNum] !== TAB) wordIdx++;
+      }
+    }
+    return true;
+  }
+
+  cursorAtStart(): boolean {
+    return this.cursorPos.x === curXStart;
+  }
 }
 
 export class BackspaceHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return true;
+    const startOfWord = getCurrentTyped(this.typed).length === 0;
+    return this.cursorAtStart() || (this.prevTypedCorrectly() && startOfWord);
   }
 
   getCursorPos(): CursorPos {
@@ -97,14 +120,15 @@ export class BackspaceHandler extends KeyHandler implements IKeyHandler {
     return { ...this.typed };
   }
 }
-
 export class EnterHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return true;
+    return !this.atEndofLine();
   }
 
   getCursorPos(): CursorPos {
-    return { x: 0, y: 0 };
+    this.cursorPos.y += curYStep;
+    this.cursorPos.x += tabSize * curXStep * this.indentCount();
+    return this.cursorPos;
   }
 
   getTyped(): Typed {
@@ -115,11 +139,33 @@ export class EnterHandler extends KeyHandler implements IKeyHandler {
     });
     return { ...this.typed };
   }
+
+  indentCount(): number {
+    const lineLen = this.sSplit.length;
+    let wordIdx = this.typed.currentWordId + 1;
+    let idx = 0;
+    let count = 0;
+    for (let i = 0; i < lineLen; i++) {
+      for (let j = 0; j < this.sSplit[i].length; j++) {
+        if (idx > wordIdx) {
+          i = lineLen;
+          break;
+        }
+        if (idx === wordIdx && this.sSplit[i][j] === TAB) {
+          idx++;
+          count++;
+          wordIdx++;
+        }
+        if (this.sSplit[i][j] !== TAB) idx++;
+      }
+    }
+    return count;
+  }
 }
 
 export class SpaceHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return true;
+    return this.atEndofLine();
   }
 
   getCursorPos(): CursorPos {
