@@ -1,5 +1,5 @@
 import { BaseSyntheticEvent, FC, useState } from "react";
-import { CodeWrapper } from "./CodeWrapper";
+import { CodeWrapper } from "./CodeWrapper/CodeWrapper";
 import { TAB } from "../utils/constants";
 import { useLanguagesQuery, useRandCodeByLangQuery } from "generated/graphql";
 import { BiShuffle } from "react-icons/bi";
@@ -50,7 +50,12 @@ export const Practice: FC = () => {
           </button>
         </div>
       </div>
-      <CodeWrapper sSplitCode={sSplitCode} bSplitCode={bSplitCode} />
+      <CodeWrapper
+        sSplitCode={sSplitCode}
+        bSplitCode={bSplitCode}
+        tabSize={2}
+      />{" "}
+      // TODO: get tabsize from lang/code
     </main>
   );
 };

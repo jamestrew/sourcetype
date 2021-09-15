@@ -1,18 +1,21 @@
-import { Typed, CursorPos } from "../components/CodeWrapper";
-import { SPACE, TAB, BACKSPACE, ENTER } from "../utils/constants";
+import { SPACE, TAB, BACKSPACE, ENTER } from "../../utils/constants";
+import { curXStart, curXStep, curYStep } from "./CodeWrapper";
+import { IKeyHandler, KeyHandlerArgs, Typed, CursorPos } from "./types";
 
-interface IKeyHandler {
-  ignoreInput(): boolean;
-  getCursorPos(): CursorPos;
-  getTyped(): Typed;
-}
-
-const curXStep = 0.582;
-const curYStep = 1.875;
-const curXStart = 0;
-const curYStart = -0.2;
 const OVERFLOW_LIMIT = 10;
-let tabSize = 2;
+
+export const createKeyHandler = (args: KeyHandlerArgs) => {
+  switch (args.key) {
+    case BACKSPACE:
+      return new BackspaceHandler(args);
+    case ENTER:
+      return new EnterHandler(args);
+    case SPACE:
+      return new SpaceHandler(args);
+    default:
+      return new KeyHandler(args);
+  }
+};
 
 export class KeyHandler implements IKeyHandler {
   key: string;
@@ -20,19 +23,15 @@ export class KeyHandler implements IKeyHandler {
   cursorPos: CursorPos;
   sSplit: string[][];
   bSplit: string[];
+  tabSize: number;
 
-  constructor(
-    key: string,
-    typed: Typed,
-    cursorPos: CursorPos,
-    sSplit: string[][],
-    bSplit: string[]
-  ) {
-    this.key = key;
-    this.typed = typed;
-    this.cursorPos = cursorPos;
-    this.sSplit = sSplit;
-    this.bSplit = bSplit;
+  constructor(args: KeyHandlerArgs) {
+    this.key = args.key;
+    this.typed = args.typed;
+    this.cursorPos = args.cursorPos;
+    this.sSplit = args.sSplit;
+    this.bSplit = args.bSplit;
+    this.tabSize = args.tabSize;
   }
 
   ignoreInput(): boolean {
@@ -127,7 +126,7 @@ export class EnterHandler extends KeyHandler implements IKeyHandler {
 
   getCursorPos(): CursorPos {
     this.cursorPos.y += curYStep;
-    this.cursorPos.x += tabSize * curXStep * this.indentCount();
+    this.cursorPos.x += this.tabSize * curXStep * this.indentCount();
     return this.cursorPos;
   }
 
@@ -182,11 +181,11 @@ export class SpaceHandler extends KeyHandler implements IKeyHandler {
   }
 }
 
-const stringifyTyped = (input: Typed["current"]): string => {
+export const stringifyTyped = (input: Typed["current"]): string => {
   return input.map((i) => i.letter).reduce((r, i) => r + i, "");
 };
 
-const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
+export const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
   let result: Typed["current"] = [];
   let [lo, hi] = [wordId, typed.current.length];
 
@@ -210,11 +209,10 @@ const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
   return result.filter((i) => i.letter !== " " && i.letter !== "\n");
 };
 
-const getCurrentTyped = (typed: Typed): Typed["current"] => {
+export const getCurrentTyped = (typed: Typed): Typed["current"] => {
   return bisectTyped(typed.currentWordId, typed);
 };
 
-export const testing = {
-  bisectTyped,
-  stringifyTyped,
+export const isWordComplete = (wordId: number, typed: Typed): boolean => {
+  return wordId < typed.currentWordId;
 };

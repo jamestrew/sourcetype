@@ -1,30 +1,14 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { CodeWrapper, Typed, testing } from "components/CodeWrapper";
+import { CodeWrapper } from "../components/CodeWrapper/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
 import { TAB, BACKSPACE, ENTER } from "../utils/constants";
-const {
-  curXStep,
-  curYStep,
-  curXStart,
-  curYStart,
-  getCursorMovement,
-  getNewTyped,
-  bisectTyped,
-  isWordComplete,
-  getCurrentTyped,
-  stringifyTyped,
-  getCursorOffset,
-  getWord,
-  backspaceIgnore,
-  prevTypedCheck,
-  enterIgnore,
-  countTabs,
-} = testing;
 
 describe("CodeWrapper", () => {
   beforeEach(() => {
-    render(<CodeWrapper sSplitCode={[["foo"]]} bSplitCode={["foo"]} />);
+    render(
+      <CodeWrapper sSplitCode={[["foo"]]} bSplitCode={["foo"]} tabSize={2} />
+    );
     jest.useFakeTimers();
   });
 
