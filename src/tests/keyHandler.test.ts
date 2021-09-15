@@ -1,4 +1,7 @@
-import { testing } from "../utils/keyHandler";
+import {
+  bisectTyped,
+  stringifyTyped,
+} from "../components/CodeWrapper/keyHandler";
 const { bisectTyped, stringifyTyped } = testing;
 
 describe("bisectTyped", () => {

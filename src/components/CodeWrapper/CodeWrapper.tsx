@@ -3,13 +3,13 @@ import { Cursor } from "../Cursor";
 import { Word } from "../Word";
 import { Tab } from "../Tab";
 import { TAB, BACKSPACE } from "../../utils/constants";
+import createKeyHandler from "./keyHandler";
 import {
-  createKeyHandler,
   isWordComplete,
   stringifyTyped,
   bisectTyped,
   getCurrentTyped,
-} from "./keyHandler";
+} from "./utils";
 
 import { Blurred, CursorPos, FocusWarning, ICodeWrapper, Typed } from "./types";
 
