@@ -26,10 +26,7 @@ class KeyHandler implements IKeyHandler {
     if (this.key === SPACE || this.key === BACKSPACE || this.key === ENTER)
       throw new Error(`${this.key} being handled by base KeyHandler`);
 
-    // BUG: these won't aways match up (check out bSplit, too many empty strings)
-    const currentTypedLen = getCurrentTyped(this.typed).length;
-    const currentWordLen = this.bSplit[this.typed.currentWordId].length;
-    return currentWordLen + OVERFLOW_LIMIT <= currentTypedLen;
+    return this.currentWordLen + OVERFLOW_LIMIT <= this.currentTypedLen;
   }
 
   getCursorPos(): CursorPos {
@@ -44,7 +41,7 @@ class KeyHandler implements IKeyHandler {
     return { ...this.typed };
   }
 
-  protected prevTypedCorrectly(): boolean {
+  get prevTypedCorrectly(): boolean {
     if (this.typed.current.length === 0) return true;
 
     const prevTypedId = this.typed.currentWordId - 1;
@@ -53,19 +50,17 @@ class KeyHandler implements IKeyHandler {
     return false;
   }
 
-  protected getWordId(): number {
+  get latestWordId(): number {
     const currLength = this.typed.current.length;
     if (currLength === 0) return 0;
     return this.typed.current[currLength - 1].wordId;
   }
 
-  getCursorOffset(): number {
-    const currentWordLength = this.bSplit[this.typed.currentWordId].length;
-    const currentTypedLength = getCurrentTyped(this.typed).length;
-    return Math.max(0, currentWordLength, currentTypedLength);
+  get cursorOffset(): number {
+    return Math.max(0, this.currentWordLen, this.currentTypedLen);
   }
 
-  atEndofLine(): boolean {
+  get cursorAtEOL(): boolean {
     let wordIdx = 0;
     for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
       for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
@@ -81,21 +76,30 @@ class KeyHandler implements IKeyHandler {
     return true;
   }
 
-  cursorAtStart(): boolean {
+  get cursorAtStart(): boolean {
     return this.cursorPos.x === curXStart;
+  }
+
+  // BUG: currentTypedLen and currentWordLen can be on different words
+  get currentTypedLen(): number {
+    return getCurrentTyped(this.typed).length;
+  }
+
+  get currentWordLen(): number {
+    return this.bSplit[this.typed.currentWordId].length;
   }
 }
 
 class BackspaceHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
     const startOfWord = getCurrentTyped(this.typed).length === 0;
-    return this.cursorAtStart() || (this.prevTypedCorrectly() && startOfWord);
+    return this.cursorAtStart || (this.prevTypedCorrectly && startOfWord);
   }
 
   getCursorPos(): CursorPos {
     let offset = 0;
     if (getCurrentTyped(this.typed).length === 0) {
-      offset = this.getCursorOffset() + 1;
+      offset = this.cursorOffset + 1;
     }
     this.cursorPos.x -= offset ? curXStep * offset : curXStep;
     return this.cursorPos;
@@ -103,14 +107,14 @@ class BackspaceHandler extends KeyHandler implements IKeyHandler {
 
   getTyped(): Typed {
     this.typed.current.pop();
-    this.typed.currentWordId = this.getWordId();
+    this.typed.currentWordId = this.latestWordId;
     return { ...this.typed };
   }
 }
 
 class EnterHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return !this.atEndofLine();
+    return !this.cursorAtEOL;
   }
 
   getCursorPos(): CursorPos {
@@ -153,7 +157,7 @@ class EnterHandler extends KeyHandler implements IKeyHandler {
 
 class SpaceHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return this.atEndofLine();
+    return this.cursorAtEOL;
   }
 
   getCursorPos(): CursorPos {
