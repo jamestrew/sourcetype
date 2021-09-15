@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { CodeWrapper } from "../components/CodeWrapper/CodeWrapper";
+import { CodeWrapper } from "../../components/CodeWrapper/CodeWrapper";
 import "@testing-library/jest-dom/extend-expect";
-import { TAB, BACKSPACE, ENTER } from "../utils/constants";
+import { TAB, BACKSPACE, ENTER } from "../../utils/constants";
 
 describe("CodeWrapper", () => {
   beforeEach(() => {

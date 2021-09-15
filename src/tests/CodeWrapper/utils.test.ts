@@ -1,8 +1,7 @@
 import {
   bisectTyped,
   stringifyTyped,
-} from "../components/CodeWrapper/keyHandler";
-const { bisectTyped, stringifyTyped } = testing;
+} from "../../components/CodeWrapper/utils";
 
 describe("bisectTyped", () => {
   it("initial state", () => {

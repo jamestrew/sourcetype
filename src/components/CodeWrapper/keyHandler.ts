@@ -44,7 +44,7 @@ class KeyHandler implements IKeyHandler {
     return { ...this.typed };
   }
 
-  prevTypedCorrectly(): boolean {
+  protected prevTypedCorrectly(): boolean {
     if (this.typed.current.length === 0) return true;
 
     const prevTypedId = this.typed.currentWordId - 1;
@@ -53,7 +53,7 @@ class KeyHandler implements IKeyHandler {
     return false;
   }
 
-  getWordId(): number {
+  protected getWordId(): number {
     const currLength = this.typed.current.length;
     if (currLength === 0) return 0;
     return this.typed.current[currLength - 1].wordId;
@@ -183,3 +183,10 @@ const createKeyHandler = (args: KeyHandlerArgs) => {
   }
 };
 export default createKeyHandler;
+
+export const testing = {
+  KeyHandler,
+  BackspaceHandler,
+  EnterHandler,
+  SpaceHandler,
+};

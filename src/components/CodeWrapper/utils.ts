@@ -8,7 +8,7 @@ export const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
   let result: Typed["current"] = [];
   let [lo, hi] = [wordId, typed.current.length];
 
-  if (wordId < 0 || wordId > typed.current.length)
+  if (wordId < 0)
     throw new Error("wordId out of expected range for bisectTyped");
 
   while (lo < hi) {

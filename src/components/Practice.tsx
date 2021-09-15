@@ -15,7 +15,14 @@ export const Practice: FC = () => {
     variables: {},
   });
 
-  const code = codeQuery.data?.randCodeByLang.snippet ?? "";
+  // const code = codeQuery.data?.randCodeByLang.snippet ?? "";
+  const code = `
+if (true) {
+  if (bar) {
+    return 'foo'
+  }
+}
+    `;
   const sSplitCode = smartSplit(code);
   const bSplitCode = code.trim().split(/[\n ]/);
 
@@ -54,8 +61,8 @@ export const Practice: FC = () => {
         sSplitCode={sSplitCode}
         bSplitCode={bSplitCode}
         tabSize={2}
-      />{" "}
-      // TODO: get tabsize from lang/code
+      />
+      {/*  TODO: get tabsize from lang/code */}
     </main>
   );
 };
