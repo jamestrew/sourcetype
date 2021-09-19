@@ -2,7 +2,7 @@ import { KeyboardEvent, FC, useState, useRef } from "react";
 import { Cursor } from "../Cursor";
 import { Word } from "../Word";
 import { Tab } from "../Tab";
-import { TAB, BACKSPACE } from "../../utils/constants";
+import { TAB_CODE, BACKSPACE } from "../../utils/constants";
 import createKeyHandler from "./keyHandler";
 import {
   isWordComplete,
@@ -94,7 +94,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
           return (
             <div className="flex flex-wrap WordList" key={lineNum}>
               {line.map((wd, wdNum) => {
-                if (wd === TAB)
+                if (wd === TAB_CODE)
                   return (
                     <Tab key={`${lineNum}:${wdNum}`} spaceSize={curXStep} />
                   );
