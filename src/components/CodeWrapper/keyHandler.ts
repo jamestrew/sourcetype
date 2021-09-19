@@ -1,4 +1,4 @@
-import { SPACE, TAB, BACKSPACE, ENTER } from "../../utils/constants";
+import { SPACE, TAB_CODE, BACKSPACE, ENTER } from "../../utils/constants";
 import { curXStart, curXStep, curYStep } from "./CodeWrapper";
 import { IKeyHandler, KeyHandlerArgs, Typed, CursorPos } from "./types";
 import { bisectTyped, getCurrentTyped, stringifyTyped } from "./utils";
@@ -90,7 +90,7 @@ class KeyHandler implements IKeyHandler {
           wordNum === this.sSplit[lineNum].length - 1
         )
           return true;
-        if (this.sSplit[lineNum][wordNum] !== TAB) wordIdx++;
+        if (this.sSplit[lineNum][wordNum] !== TAB_CODE) wordIdx++;
       }
     }
     return false;
@@ -166,12 +166,12 @@ class EnterHandler extends KeyHandler implements IKeyHandler {
           i = lineLen;
           break;
         }
-        if (idx === wordIdx && this.sSplit[i][j] === TAB) {
+        if (idx === wordIdx && this.sSplit[i][j] === TAB_CODE) {
           idx++;
           count++;
           wordIdx++;
         }
-        if (this.sSplit[i][j] !== TAB) idx++;
+        if (this.sSplit[i][j] !== TAB_CODE) idx++;
       }
     }
     return count;
