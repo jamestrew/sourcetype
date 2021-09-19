@@ -142,7 +142,7 @@ class EnterHandler extends KeyHandler implements IKeyHandler {
 
   getCursorPos(): CursorPos {
     this.cursorPos.y += curYStep;
-    this.cursorPos.x += this.tabSize * curXStep * this.indentCount();
+    this.cursorPos.x = this.tabSize * curXStep * this.indentCount();
     return this.cursorPos;
   }
 
