@@ -27,7 +27,7 @@ const bCode = [
 ];
 
 describe("LETTERS", () => {
-  it("letter", () => {
+  it("at start", () => {
     const typed = {
       currentWordId: 0,
       current: [],
@@ -54,6 +54,108 @@ describe("LETTERS", () => {
       x: curXStart + curXStep,
       y: curYStart,
     });
+  });
+
+  it("at overflow limit", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart,
+      y: curYStart,
+    };
+    const handler = new KeyHandler({
+      key: "a",
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("not letter - space", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    const cursorPos = {
+      x: curXStart,
+      y: curYStart,
+    };
+    const handler = new KeyHandler({
+      key: SPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(() => handler.ignoreInput()).toThrowError(
+      `${SPACE} being handled by base KeyHandler`
+    );
+  });
+
+  it("not letter - enter", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    const cursorPos = {
+      x: curXStart,
+      y: curYStart,
+    };
+    const handler = new KeyHandler({
+      key: ENTER,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(() => handler.ignoreInput()).toThrowError(
+      `${ENTER} being handled by base KeyHandler`
+    );
+  });
+  it("not letter - BACKSPACE", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    const cursorPos = {
+      x: curXStart,
+      y: curYStart,
+    };
+    const handler = new KeyHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(() => handler.ignoreInput()).toThrowError(
+      `${BACKSPACE} being handled by base KeyHandler`
+    );
   });
 });
 
