@@ -4,7 +4,7 @@ import {
   curYStart,
   curYStep,
 } from "components/CodeWrapper/CodeWrapper";
-import { BACKSPACE, ENTER, SPACE, TAB } from "utils/constants";
+import { BACKSPACE, ENTER, ENTER_CODE, SPACE, TAB_CODE } from "utils/constants";
 import createKeyHandler, {
   testing,
 } from "../../components/CodeWrapper/keyHandler";
@@ -12,9 +12,9 @@ const { KeyHandler, BackspaceHandler, EnterHandler, SpaceHandler } = testing;
 
 const sCode = [
   ["if", "(true)", "{"],
-  [TAB, "if", "(bar)", "{"],
-  [TAB, TAB, "return", "'foo"],
-  [TAB, "}"],
+  [TAB_CODE, "if", "(bar)", "{"],
+  [TAB_CODE, TAB_CODE, "return", "'foo"],
+  [TAB_CODE, "}"],
   ["}"],
 ];
 
@@ -439,7 +439,7 @@ describe("ENTER", () => {
         { wordId: 1, letter: ")" },
         { wordId: 2, letter: " " },
         { wordId: 2, letter: "{" },
-        { wordId: 3, letter: " " },
+        { wordId: 3, letter: ENTER_CODE },
       ],
     });
     expect(handler.newCursorPos).toEqual({

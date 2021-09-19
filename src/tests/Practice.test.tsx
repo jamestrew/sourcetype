@@ -1,6 +1,6 @@
 import { testing } from "../components/Practice";
-import { TAB } from "../utils/constants";
-const { smartSplit } = testing;
+import { ENTER_CODE, TAB_CODE } from "../utils/constants";
+const { smartSplit, basicSplit } = testing;
 
 /**
  * smartSplit
@@ -24,7 +24,9 @@ describe("smart splitting", () => {
 
   it("one line sentence with TABs", () => {
     const str = "these  are  TAB  spaced";
-    const result = [["these", TAB, "are", TAB, "TAB", TAB, "spaced"]];
+    const result = [
+      ["these", TAB_CODE, "are", TAB_CODE, "TAB", TAB_CODE, "spaced"],
+    ];
     expect(smartSplit(str)).toEqual(result);
   });
 
@@ -42,7 +44,7 @@ lines`;
 }`;
     const result = [
       ["if", "(true)", "{"],
-      [TAB, "const", "foo", "=", "'bar'"],
+      [TAB_CODE, "const", "foo", "=", "'bar'"],
       ["}"],
     ];
     expect(smartSplit(str)).toEqual(result);
@@ -56,8 +58,8 @@ lines`;
   `;
     const result = [
       ["def", "func:"],
-      [TAB, "if", "foo:"],
-      [TAB, TAB, "return", "True"],
+      [TAB_CODE, "if", "foo:"],
+      [TAB_CODE, TAB_CODE, "return", "True"],
     ];
     expect(smartSplit(str)).toEqual(result);
   });
@@ -73,12 +75,41 @@ func()
 `;
     const result = [
       ["def", "func:"],
-      [TAB, "if", "foo:"],
-      [TAB, TAB, "return", "True"],
+      [TAB_CODE, "if", "foo:"],
+      [TAB_CODE, TAB_CODE, "return", "True"],
       [""],
       [""],
       ["func()"],
     ];
     expect(smartSplit(str)).toEqual(result);
+  });
+});
+
+describe("basic split", () => {
+  it("empty string", () => {
+    expect(basicSplit("")).toEqual([]);
+  });
+
+  it("code 2 space tabs", () => {
+    const code = `
+if (true) {
+  if (bar) {
+    return 'foo'
+  }
+}
+    `;
+
+    expect(basicSplit(code)).toEqual([
+      "if",
+      "(true)",
+      "{",
+      "if",
+      "(bar)",
+      "{",
+      "return",
+      "'foo'",
+      "}",
+      "}",
+    ]);
   });
 });
