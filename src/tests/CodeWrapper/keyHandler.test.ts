@@ -2,6 +2,7 @@ import {
   curXStart,
   curXStep,
   curYStart,
+  curYStep,
 } from "components/CodeWrapper/CodeWrapper";
 import { BACKSPACE, ENTER, SPACE, TAB } from "utils/constants";
 import createKeyHandler, {
@@ -206,7 +207,7 @@ describe("ENTER", () => {
 });
 
 describe("BACKSPACE", () => {
-  it("at start", () => {
+  it("IGNORE: at start", () => {
     const typed = {
       currentWordId: 0,
       current: [],
@@ -225,5 +226,156 @@ describe("BACKSPACE", () => {
     });
 
     expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("IGNORE: at start of word - prev word correct", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("IGNORE: at start of word - prev word incorrect", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "r" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(false);
+  });
+
+  it("IGNORE: at start of new line - prev word correct", () => {
+    const typed = {
+      currentWordId: 3,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "(" },
+        { wordId: 1, letter: "t" },
+        { wordId: 1, letter: "r" },
+        { wordId: 1, letter: "u" },
+        { wordId: 1, letter: "e" },
+        { wordId: 1, letter: ")" },
+        { wordId: 2, letter: " " },
+        { wordId: 2, letter: "{" },
+        { wordId: 3, letter: " " },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 2 * curXStep,
+      y: curYStart + curYStep,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("IGNORE: at start of new line - prev word incorrect", () => {
+    const typed = {
+      currentWordId: 3,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "(" },
+        { wordId: 1, letter: "t" },
+        { wordId: 1, letter: "r" },
+        { wordId: 1, letter: "u" },
+        { wordId: 1, letter: "e" },
+        { wordId: 1, letter: ")" },
+        { wordId: 2, letter: " " },
+        { wordId: 2, letter: "}" },
+        { wordId: 3, letter: " " },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 2 * curXStep,
+      y: curYStart + curYStep,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(false);
+  });
+
+  it("delete letter", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 2 * curXStep,
+      y: curYStart,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    handler.handleKey();
+    expect(handler.ignoreInput()).toBe(false);
+    expect(handler.newTyped).toEqual({
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "i" }],
+    });
+    expect(handler.newCursorPos).toEqual({
+      x: curXStart + curXStep,
+      y: curYStart,
+    });
   });
 });
