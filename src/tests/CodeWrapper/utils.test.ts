@@ -13,37 +13,14 @@ describe("bisectTyped", () => {
     expect(word).toEqual([]);
   });
 
-  it("fetch out-of-range wordId (-1)", () => {
+  it("fetch out-of-range wordId", () => {
     const next = {
       currentWordId: 0,
       current: [],
     };
-    function outOfBounds() {
-      bisectTyped(-1, next);
-    }
-    expect(outOfBounds).toThrowError(/expected range/);
-  });
-
-  it.skip("fetch out-of-range wordId (.5)", () => {
-    const next = {
-      currentWordId: 0,
-      current: [],
-    };
-    function outOfBounds() {
-      bisectTyped(0.5, next);
-    }
-    expect(outOfBounds).toThrowError(/expected range/);
-  });
-
-  it.skip("fetch out-of-range wordId (too big)", () => {
-    const next = {
-      currentWordId: 0,
-      current: [],
-    };
-    function outOfBounds() {
-      bisectTyped(1, next);
-    }
-    expect(outOfBounds).toThrowError(/expected range/);
+    expect(bisectTyped(-1, next)).toEqual([]);
+    expect(bisectTyped(1, next)).toEqual([]);
+    expect(bisectTyped(0.5, next)).toEqual([]);
   });
 
   it("middle fetch", () => {
