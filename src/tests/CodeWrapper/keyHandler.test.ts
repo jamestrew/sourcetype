@@ -3,7 +3,7 @@ import {
   curXStep,
   curYStart,
 } from "components/CodeWrapper/CodeWrapper";
-import { TAB } from "utils/constants";
+import { BACKSPACE, ENTER, SPACE, TAB } from "utils/constants";
 import createKeyHandler, {
   testing,
 } from "../../components/CodeWrapper/keyHandler";
@@ -68,7 +68,53 @@ describe("SPACE", () => {
       y: curYStart,
     };
     const handler = new SpaceHandler({
-      key: " ",
+      key: SPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(false);
+  });
+});
+
+describe("ENTER", () => {
+  it("at start", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    const cursorPos = {
+      x: curXStart,
+      y: curYStart,
+    };
+    const handler = new EnterHandler({
+      key: ENTER,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(true);
+  });
+});
+
+describe("BACKSPACE", () => {
+  it("at start", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [],
+    };
+    const cursorPos = {
+      x: curXStart,
+      y: curYStart,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
       typed,
       cursorPos,
       sSplit: sCode,

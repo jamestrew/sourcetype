@@ -84,16 +84,16 @@ class KeyHandler implements IKeyHandler {
     let wordIdx = 0;
     for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
       for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
-        if (wordIdx > this.typed.currentWordId) return true;
+        if (wordIdx > this.typed.currentWordId) return false;
         if (
           this.typed.currentWordId === wordIdx &&
           wordNum === this.sSplit[lineNum].length - 1
         )
-          return false;
+          return true;
         if (this.sSplit[lineNum][wordNum] !== TAB) wordIdx++;
       }
     }
-    return true;
+    return false;
   }
 
   get cursorAtStart(): boolean {
@@ -181,7 +181,9 @@ class SpaceHandler extends KeyHandler implements IKeyHandler {
   }
 
   getCursorPos(): CursorPos {
-    return { x: 0, y: 0 };
+    const offset = this.cursorOffset + 1;
+    this.cursorPos.x += curXStep * offset;
+    return this.cursorPos;
   }
 
   getTyped(): Typed {
