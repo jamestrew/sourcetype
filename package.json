@@ -19,7 +19,7 @@
     "scripts": {
         "start:react": "craco start",
         "build:react": "craco build",
-        "test:react": "craco test --verbose --passWithNoTests",
+        "test:react": "craco test --passWithNoTests",
         "eject:src": "react-scripts eject",
         "start:server": "ts-node ./server/src/index.ts",
         "codegen": "graphql-codegen --config codegen.yml"
