@@ -161,7 +161,7 @@ describe("LETTERS", () => {
 });
 
 describe("SPACE", () => {
-  it("at start", () => {
+  it("IGNORE: at very start", () => {
     const typed = {
       currentWordId: 0,
       current: [],
@@ -179,7 +179,171 @@ describe("SPACE", () => {
       tabSize: 2,
     });
 
-    expect(handler.ignoreInput()).toBe(false);
+    expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("IGNORE: at start of word", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 3 * curXStart,
+      y: curYStart,
+    };
+    const handler = new SpaceHandler({
+      key: SPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("IGNORE: at end of line", () => {
+    const typed = {
+      currentWordId: 2,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "(" },
+        { wordId: 1, letter: "t" },
+        { wordId: 1, letter: "r" },
+        { wordId: 1, letter: "u" },
+        { wordId: 1, letter: "e" },
+        { wordId: 1, letter: ")" },
+        { wordId: 2, letter: " " },
+        { wordId: 2, letter: "{" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 11 * curXStep,
+      y: curYStart,
+    };
+    const handler = new SpaceHandler({
+      key: SPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("end of word space", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 2 * curXStep,
+      y: curYStart,
+    };
+    const handler = new SpaceHandler({
+      key: SPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    handler.handleKey();
+    expect(handler.newTyped).toEqual({
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+      ],
+    });
+    expect(handler.newCursorPos).toEqual({
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    });
+  });
+
+  it("mid-word space", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "i" }],
+    };
+    const cursorPos = {
+      x: curXStart + curXStep,
+      y: curYStart,
+    };
+    const handler = new SpaceHandler({
+      key: SPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    handler.handleKey();
+    expect(handler.newTyped).toEqual({
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 1, letter: " " },
+      ],
+    });
+    expect(handler.newCursorPos).toEqual({
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    });
+  });
+
+  it("overtyped-word space", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "i" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    };
+    const handler = new SpaceHandler({
+      key: SPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    handler.handleKey();
+    expect(handler.newTyped).toEqual({
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "i" },
+        { wordId: 1, letter: " " },
+      ],
+    });
+    expect(handler.newCursorPos).toEqual({
+      x: curXStart + 4 * curXStep,
+      y: curYStart,
+    });
   });
 });
 
@@ -378,4 +542,8 @@ describe("BACKSPACE", () => {
       y: curYStart,
     });
   });
+
+  it.todo(
+    "space mid word > jump to next word > backspace back a word to last letter"
+  );
 });
