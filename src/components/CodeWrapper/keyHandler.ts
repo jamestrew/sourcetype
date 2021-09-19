@@ -61,7 +61,7 @@ class KeyHandler implements IKeyHandler {
     return this.results.typed;
   }
 
-  get prevTypedCorrectly(): boolean {
+  protected get prevTypedCorrectly(): boolean {
     if (this.typed.current.length === 0) return true;
 
     const prevTypedId = this.typed.currentWordId - 1;
@@ -70,17 +70,17 @@ class KeyHandler implements IKeyHandler {
     return false;
   }
 
-  get latestWordId(): number {
+  protected get latestWordId(): number {
     const currLength = this.typed.current.length;
     if (currLength === 0) return 0;
     return this.typed.current[currLength - 1].wordId;
   }
 
-  get cursorOffset(): number {
+  protected get cursorOffset(): number {
     return Math.max(0, this.currentWordLen, this.currentTypedLen);
   }
 
-  get cursorAtEOL(): boolean {
+  protected get cursorAtEOL(): boolean {
     let wordIdx = 0;
     for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
       for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
@@ -96,16 +96,16 @@ class KeyHandler implements IKeyHandler {
     return false;
   }
 
-  get cursorAtStart(): boolean {
+  protected get cursorAtStart(): boolean {
     return this.cursorPos.x === curXStart;
   }
 
   // BUG: currentTypedLen and currentWordLen can be on different words
-  get currentTypedLen(): number {
+  protected get currentTypedLen(): number {
     return getCurrentTyped(this.typed).length;
   }
 
-  get currentWordLen(): number {
+  protected get currentWordLen(): number {
     return this.bSplit[this.typed.currentWordId].length;
   }
 }
