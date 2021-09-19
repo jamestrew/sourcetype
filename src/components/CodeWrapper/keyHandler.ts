@@ -77,7 +77,7 @@ class KeyHandler implements IKeyHandler {
   }
 
   protected get cursorOffset(): number {
-    return Math.max(0, this.currentWordLen, this.currentTypedLen);
+    return Math.max(0, this.currentWordLen - this.currentTypedLen);
   }
 
   protected get cursorAtEOL(): boolean {
@@ -100,6 +100,10 @@ class KeyHandler implements IKeyHandler {
     return this.cursorPos.x === curXStart;
   }
 
+  protected get startOfWord(): boolean {
+    return getCurrentTyped(this.typed).length === 0;
+  }
+
   // BUG: currentTypedLen and currentWordLen can be on different words
   protected get currentTypedLen(): number {
     return getCurrentTyped(this.typed).length;
@@ -112,8 +116,7 @@ class KeyHandler implements IKeyHandler {
 
 class BackspaceHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    const startOfWord = getCurrentTyped(this.typed).length === 0;
-    return this.cursorAtStart || (this.prevTypedCorrectly && startOfWord);
+    return this.cursorAtStart || (this.prevTypedCorrectly && this.startOfWord);
   }
 
   getCursorPos(): CursorPos {
@@ -177,7 +180,7 @@ class EnterHandler extends KeyHandler implements IKeyHandler {
 
 class SpaceHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return this.cursorAtEOL;
+    return this.cursorAtEOL || this.startOfWord;
   }
 
   getCursorPos(): CursorPos {
