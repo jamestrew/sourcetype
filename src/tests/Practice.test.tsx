@@ -103,16 +103,12 @@ if (true) {
       "if",
       "(true)",
       "{",
-      ENTER_CODE,
       "if",
       "(bar)",
       "{",
-      ENTER_CODE,
       "return",
       "'foo'",
-      ENTER_CODE,
       "}",
-      ENTER_CODE,
       "}",
     ]);
   });

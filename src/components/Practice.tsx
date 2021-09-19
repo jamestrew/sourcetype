@@ -107,9 +107,7 @@ const basicSplit = (str: string | null): string[] => {
     words.forEach((word) => {
       if (word) result.push(word);
     });
-    result.push(ENTER_CODE);
   });
-  result.pop();
   return result;
 };
 
