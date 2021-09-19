@@ -348,7 +348,7 @@ describe("SPACE", () => {
 });
 
 describe("ENTER", () => {
-  it("at start", () => {
+  it("IGNORE: at start", () => {
     const typed = {
       currentWordId: 0,
       current: [],
@@ -367,6 +367,85 @@ describe("ENTER", () => {
     });
 
     expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("IGNORE: mid line", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 2 * curXStep,
+      y: curYStart,
+    };
+    const handler = new EnterHandler({
+      key: ENTER,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(true);
+  });
+
+  it("end of line", () => {
+    const typed = {
+      currentWordId: 2,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "(" },
+        { wordId: 1, letter: "t" },
+        { wordId: 1, letter: "r" },
+        { wordId: 1, letter: "u" },
+        { wordId: 1, letter: "e" },
+        { wordId: 1, letter: ")" },
+        { wordId: 2, letter: " " },
+        { wordId: 2, letter: "{" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 11 * curXStep,
+      y: curYStart,
+    };
+    const handler = new EnterHandler({
+      key: ENTER,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(false);
+    handler.handleKey();
+    expect(handler.newTyped).toEqual({
+      currentWordId: 3,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "(" },
+        { wordId: 1, letter: "t" },
+        { wordId: 1, letter: "r" },
+        { wordId: 1, letter: "u" },
+        { wordId: 1, letter: "e" },
+        { wordId: 1, letter: ")" },
+        { wordId: 2, letter: " " },
+        { wordId: 2, letter: "{" },
+        { wordId: 3, letter: " " },
+      ],
+    });
+    expect(handler.newCursorPos).toEqual({
+      x: curXStart + 2 * curXStep,
+      y: curYStart + curYStep,
+    });
   });
 });
 
