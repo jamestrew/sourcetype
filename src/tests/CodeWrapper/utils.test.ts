@@ -24,7 +24,7 @@ describe("bisectTyped", () => {
     expect(outOfBounds).toThrowError(/expected range/);
   });
 
-  it("fetch out-of-range wordId (.5)", () => {
+  it.skip("fetch out-of-range wordId (.5)", () => {
     const next = {
       currentWordId: 0,
       current: [],
@@ -35,7 +35,7 @@ describe("bisectTyped", () => {
     expect(outOfBounds).toThrowError(/expected range/);
   });
 
-  it("fetch out-of-range wordId (too big)", () => {
+  it.skip("fetch out-of-range wordId (too big)", () => {
     const next = {
       currentWordId: 0,
       current: [],
