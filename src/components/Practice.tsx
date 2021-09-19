@@ -1,6 +1,6 @@
 import { BaseSyntheticEvent, FC, useState } from "react";
 import { CodeWrapper } from "./CodeWrapper/CodeWrapper";
-import { TAB } from "../utils/constants";
+import { ENTER_CODE, TAB_CODE } from "../utils/constants";
 import { useLanguagesQuery, useRandCodeByLangQuery } from "generated/graphql";
 import { BiShuffle } from "react-icons/bi";
 
@@ -24,7 +24,7 @@ if (true) {
 }
     `;
   const sSplitCode = smartSplit(code);
-  const bSplitCode = code.trim().split(/[\n ]/);
+  const bSplitCode = basicSplit(code);
 
   const langChange = (e: BaseSyntheticEvent) => {
     setLangId(Number(e.target.value));
@@ -67,14 +67,9 @@ if (true) {
   );
 };
 
-/**
- * Tokenizes a formatted multi-line code block
- * @param {(string | null)} str - a code block
- * @returns {string[][]} array of words and format strings per line
- */
 const smartSplit = (str: string | null): string[][] => {
   let words: string[][] = [];
-  if (str == null || str === "") return words;
+  if (!str) return words;
 
   str = str.trim();
 
@@ -84,7 +79,7 @@ const smartSplit = (str: string | null): string[][] => {
     if (str[i] === " " || i === str.length) {
       if (str[i + 1] === " ") {
         if (word) line.push(word);
-        word = TAB;
+        word = TAB_CODE;
         i++;
       }
       line.push(word);
@@ -102,6 +97,23 @@ const smartSplit = (str: string | null): string[][] => {
   return words;
 };
 
+const basicSplit = (str: string | null): string[] => {
+  let result: string[] = [];
+  if (!str) return result;
+
+  const lines = str.trim().split("\n");
+  lines.forEach((line) => {
+    const words = line.split(" ");
+    words.forEach((word) => {
+      if (word) result.push(word);
+    });
+    result.push(ENTER_CODE);
+  });
+  result.pop();
+  return result;
+};
+
 export const testing = {
   smartSplit,
+  basicSplit,
 };
