@@ -2,7 +2,7 @@ import { KeyboardEvent, FC, useState, useRef } from "react";
 import { Cursor } from "../Cursor";
 import { Word } from "../Word";
 import { Tab } from "../Tab";
-import { TAB_CODE, BACKSPACE } from "../../utils/constants";
+import { TAB_CODE, BACKSPACE, ENTER_CODE } from "../../utils/constants";
 import createKeyHandler from "./keyHandler";
 import {
   isWordComplete,
@@ -104,7 +104,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
                   <Word
                     key={i}
                     text={wd}
-                    value={stringifyTyped(bisectTyped(i, typed)).split("")}
+                    value={currentTypedWord(typed, i)}
                     isComplete={isWordComplete(i, typed)}
                   />
                 );
@@ -129,4 +129,14 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
       </div>
     </>
   );
+};
+
+const currentTypedWord = (typed: Typed, idx: number): string[] => {
+  return stringifyTyped(bisectTyped(idx, typed))
+    .replaceAll(ENTER_CODE, "")
+    .split("");
+};
+
+export const testing = {
+  currentTypedWord,
 };
