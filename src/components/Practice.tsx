@@ -1,6 +1,6 @@
 import { BaseSyntheticEvent, FC, useState } from "react";
 import { CodeWrapper } from "./CodeWrapper/CodeWrapper";
-import { ENTER_CODE, TAB_CODE } from "../utils/constants";
+import { TAB_CODE } from "../utils/constants";
 import { useLanguagesQuery, useRandCodeByLangQuery } from "generated/graphql";
 import { BiShuffle } from "react-icons/bi";
 

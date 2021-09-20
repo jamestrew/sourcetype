@@ -4,6 +4,7 @@ import {
   curYStart,
   curYStep,
 } from "components/CodeWrapper/CodeWrapper";
+import { bisectTyped } from "components/CodeWrapper/utils";
 import { BACKSPACE, ENTER, ENTER_CODE, SPACE, TAB_CODE } from "utils/constants";
 import createKeyHandler, {
   testing,
@@ -610,8 +611,8 @@ describe("BACKSPACE", () => {
       tabSize: 2,
     });
 
-    handler.handleKey();
     expect(handler.ignoreInput()).toBe(false);
+    handler.handleKey();
     expect(handler.newTyped).toEqual({
       currentWordId: 0,
       current: [{ wordId: 0, letter: "i" }],
@@ -622,7 +623,112 @@ describe("BACKSPACE", () => {
     });
   });
 
-  it.todo(
-    "space mid word > jump to next word > backspace back a word to last letter"
-  );
+  it("one letter word typed wrong", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+        { wordId: 1, letter: "?" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 4 * curXStep,
+      y: curYStart,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(false);
+    handler.handleKey();
+    expect(handler.newTyped).toEqual({
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 1, letter: " " },
+      ],
+    });
+    expect(handler.newCursorPos.x).toBeCloseTo(curXStart + 3 * curXStep, 6);
+    expect(handler.newCursorPos.y).toBeCloseTo(curYStart);
+  });
+
+  it("jump to next word mid word> backspace back a word to last letter", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 1, letter: " " },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 3 * curXStep,
+      y: curYStart,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(false);
+    handler.handleKey();
+    expect(handler.newTyped).toEqual({
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "i" }],
+    });
+    expect(handler.newCursorPos.x).toBeCloseTo(curXStart + 1 * curXStep, 6);
+    expect(handler.newCursorPos.y).toBeCloseTo(curYStart);
+  });
+
+  it("type past word length", () => {
+    const typed = {
+      currentWordId: 1,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+      ],
+    };
+    const cursorPos = {
+      x: curXStart + 6 * curXStep,
+      y: curYStart,
+    };
+    const handler = new BackspaceHandler({
+      key: BACKSPACE,
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+      tabSize: 2,
+    });
+
+    expect(handler.ignoreInput()).toBe(false);
+    handler.handleKey();
+    expect(handler.newTyped).toEqual({
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "i" },
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+        { wordId: 0, letter: "z" },
+      ],
+    });
+    expect(handler.newCursorPos.x).toBeCloseTo(curXStart + 5 * curXStep, 6);
+    expect(handler.newCursorPos.y).toBeCloseTo(curYStart);
+  });
 });

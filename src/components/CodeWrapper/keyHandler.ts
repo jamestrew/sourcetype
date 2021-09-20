@@ -72,8 +72,7 @@ class KeyHandler implements IKeyHandler {
 
     const prevTypedId = this.typed.currentWordId - 1;
     const prevTyped = stringifyTyped(bisectTyped(prevTypedId, this.typed));
-    if (this.bSplit[prevTypedId] === prevTyped) return true;
-    return false;
+    return this.bSplit[prevTypedId] === prevTyped;
   }
 
   protected get latestWordId(): number {
@@ -82,8 +81,12 @@ class KeyHandler implements IKeyHandler {
     return this.typed.current[currLength - 1].wordId;
   }
 
-  protected get cursorOffset(): number {
+  protected get currentCursorOffset(): number {
     return Math.max(0, this.currentWordLen - this.currentTypedLen);
+  }
+
+  protected get prevCursorOffset(): number {
+    return Math.max(0, this.prevWordLen - this.prevTypedLen);
   }
 
   protected get cursorAtEOL(): boolean {
@@ -110,13 +113,28 @@ class KeyHandler implements IKeyHandler {
     return getCurrentTyped(this.typed).length === 0;
   }
 
-  // BUG: currentTypedLen and currentWordLen can be on different words
   protected get currentTypedLen(): number {
-    return getCurrentTyped(this.typed).length;
+    return this.typedLen(this.typed.currentWordId);
   }
 
   protected get currentWordLen(): number {
-    return this.bSplit[this.typed.currentWordId].length;
+    return this.wordLen(this.typed.currentWordId);
+  }
+
+  protected get prevTypedLen(): number {
+    return this.typedLen(this.typed.currentWordId - 1);
+  }
+
+  protected get prevWordLen(): number {
+    return this.wordLen(this.typed.currentWordId - 1);
+  }
+
+  protected typedLen(wordId: number): number {
+    return bisectTyped(wordId, this.typed).length;
+  }
+
+  protected wordLen(wordId: number): number {
+    return this.bSplit[wordId].length;
   }
 }
 
@@ -127,8 +145,13 @@ class BackspaceHandler extends KeyHandler implements IKeyHandler {
 
   getCursorPos(): CursorPos {
     let offset = 0;
-    if (getCurrentTyped(this.typed).length === 0) {
-      offset = this.cursorOffset + 1;
+
+    if (
+      this.startOfWord &&
+      !this.prevTypedCorrectly &&
+      this.typed.currentWordId !== 0
+    ) {
+      offset = this.prevCursorOffset + 1;
     }
     this.cursorPos.x -= offset ? curXStep * offset : curXStep;
     return this.cursorPos;
@@ -190,7 +213,7 @@ class SpaceHandler extends KeyHandler implements IKeyHandler {
   }
 
   getCursorPos(): CursorPos {
-    const offset = this.cursorOffset + 1;
+    const offset = this.currentCursorOffset + 1;
     this.cursorPos.x += curXStep * offset;
     return this.cursorPos;
   }
