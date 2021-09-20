@@ -13,13 +13,11 @@ export type KeyHandlerArgs = {
   cursorPos: CursorPos;
   sSplit: string[][];
   bSplit: string[];
-  tabSize: number;
 };
 
 export interface ICodeWrapper {
   sSplitCode: string[][];
   bSplitCode: string[];
-  tabSize: number;
 }
 
 export type Typed = {

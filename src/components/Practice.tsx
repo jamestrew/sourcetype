@@ -16,13 +16,6 @@ export const Practice: FC = () => {
   });
 
   const code = codeQuery.data?.randCodeByLang.snippet ?? "";
-  //   const code = `
-  // if (true) {
-  //   if (bar) {
-  //     return 'foo'
-  //   }
-  // }
-  //     `;
   const sSplitCode = smartSplit(code);
   const bSplitCode = basicSplit(code);
 
@@ -57,12 +50,7 @@ export const Practice: FC = () => {
           </button>
         </div>
       </div>
-      <CodeWrapper
-        sSplitCode={sSplitCode}
-        bSplitCode={bSplitCode}
-        tabSize={2}
-      />
-      {/*  TODO: get tabsize from lang/code */}
+      <CodeWrapper sSplitCode={sSplitCode} bSplitCode={bSplitCode} />
     </main>
   );
 };

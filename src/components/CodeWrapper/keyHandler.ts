@@ -17,8 +17,8 @@ class KeyHandler implements IKeyHandler {
   cursorPos: CursorPos;
   sSplit: string[][];
   bSplit: string[];
-  tabSize: number;
   private results: { cursorPos: CursorPos; typed: Typed } | null;
+  readonly tabSize = 2;
 
   constructor(args: KeyHandlerArgs) {
     this.key = args.key;
@@ -26,7 +26,6 @@ class KeyHandler implements IKeyHandler {
     this.cursorPos = args.cursorPos;
     this.sSplit = args.sSplit;
     this.bSplit = args.bSplit;
-    this.tabSize = args.tabSize;
     this.results = null;
   }
 

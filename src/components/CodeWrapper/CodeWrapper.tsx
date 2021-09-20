@@ -18,11 +18,7 @@ export const curYStep = 1.875;
 export const curXStart = 0;
 export const curYStart = -0.2;
 
-export const CodeWrapper: FC<ICodeWrapper> = ({
-  sSplitCode,
-  bSplitCode,
-  tabSize,
-}) => {
+export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   const [cursorPos, setCursorPos] = useState<CursorPos>({
     x: curXStart,
     y: curYStart,
@@ -44,7 +40,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
       cursorPos,
       sSplit: sSplitCode,
       bSplit: bSplitCode,
-      tabSize,
     });
 
     if (keyHandler.ignoreInput()) return;
