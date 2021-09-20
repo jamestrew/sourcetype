@@ -134,3 +134,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
 const currentTypedWord = (typed: Typed, idx: number): string[] => {
   return stringifyTyped(bisectTyped(idx, typed)).split("");
 };
+
+export const testing = {
+  currentTypedWord,
+};
