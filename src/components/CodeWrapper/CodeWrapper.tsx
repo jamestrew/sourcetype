@@ -104,7 +104,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
                   <Word
                     key={i}
                     text={wd}
-                    value={stringifyTyped(bisectTyped(i, typed)).split("")}
+                    value={currentTypedWord(typed, i)}
                     isComplete={isWordComplete(i, typed)}
                   />
                 );
@@ -129,4 +129,8 @@ export const CodeWrapper: FC<ICodeWrapper> = ({
       </div>
     </>
   );
+};
+
+const currentTypedWord = (typed: Typed, idx: number): string[] => {
+  return stringifyTyped(bisectTyped(idx, typed)).split("");
 };
