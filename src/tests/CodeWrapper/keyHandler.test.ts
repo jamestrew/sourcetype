@@ -4,7 +4,7 @@ import {
   curYStart,
   curYStep,
 } from "components/CodeWrapper/CodeWrapper";
-import { bisectTyped } from "components/CodeWrapper/utils";
+import { KeyHandlerArgs } from "components/CodeWrapper/types";
 import { BACKSPACE, ENTER, ENTER_CODE, SPACE, TAB_CODE } from "utils/constants";
 import createKeyHandler, {
   testing,
@@ -730,5 +730,41 @@ describe("BACKSPACE", () => {
     });
     expect(handler.newCursorPos.x).toBeCloseTo(curXStart + 5 * curXStep, 6);
     expect(handler.newCursorPos.y).toBeCloseTo(curYStart);
+  });
+});
+
+describe("createKeyHandler", () => {
+  const typed = {
+    currentWordId: 0,
+    current: [],
+  };
+  const cursorPos = { x: 0, y: 0 };
+  let arg: KeyHandlerArgs = {
+    key: "",
+    typed,
+    cursorPos,
+    sSplit: sCode,
+    bSplit: bCode,
+    tabSize: 2,
+  };
+
+  it("letters", () => {
+    arg.key = "a";
+    expect(createKeyHandler(arg)).toBeInstanceOf(KeyHandler);
+  });
+
+  it("space", () => {
+    arg.key = SPACE;
+    expect(createKeyHandler(arg)).toBeInstanceOf(SpaceHandler);
+  });
+
+  it("enter", () => {
+    arg.key = ENTER;
+    expect(createKeyHandler(arg)).toBeInstanceOf(EnterHandler);
+  });
+
+  it("backspace", () => {
+    arg.key = BACKSPACE;
+    expect(createKeyHandler(arg)).toBeInstanceOf(BackspaceHandler);
   });
 });
