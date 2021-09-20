@@ -15,14 +15,14 @@ export const Practice: FC = () => {
     variables: {},
   });
 
-  // const code = codeQuery.data?.randCodeByLang.snippet ?? "";
-  const code = `
-if (true) {
-  if (bar) {
-    return 'foo'
-  }
-}
-    `;
+  const code = codeQuery.data?.randCodeByLang.snippet ?? "";
+  //   const code = `
+  // if (true) {
+  //   if (bar) {
+  //     return 'foo'
+  //   }
+  // }
+  //     `;
   const sSplitCode = smartSplit(code);
   const bSplitCode = basicSplit(code);
 
