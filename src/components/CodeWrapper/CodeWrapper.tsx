@@ -9,6 +9,7 @@ import {
   stringifyTyped,
   bisectTyped,
   getCurrentTyped,
+  bisectTypedClean,
 } from "./utils";
 
 import { Blurred, CursorPos, FocusWarning, ICodeWrapper, Typed } from "./types";
@@ -105,7 +106,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
                   <Word
                     key={i}
                     text={wd}
-                    value={currentTypedWord(typed, i)}
+                    value={stringifyTyped(bisectTyped(i, typed)).split("")}
                     isComplete={isWordComplete(i, typed)}
                   />
                 );
@@ -120,7 +121,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
           data-testid="codeInput"
           ref={focusInputRef}
           tabIndex={0}
-          defaultValue={stringifyTyped(getCurrentTyped(typed))}
           autoComplete="off"
           onKeyPress={handleKeyPress}
           onKeyDown={(e) => e.key === BACKSPACE && handleKeyPress(e)}
@@ -132,6 +132,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   );
 };
 
+// FIX: deprecated
 const currentTypedWord = (typed: Typed, idx: number): string[] => {
   return stringifyTyped(bisectTyped(idx, typed))
     .replaceAll(ENTER_CODE, "")

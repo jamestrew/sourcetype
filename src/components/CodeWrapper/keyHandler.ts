@@ -67,14 +67,6 @@ class KeyHandler implements IKeyHandler {
       return false;
     }
 
-    // BUG: newline typedLen is 1 longer than is should be
-    console.log(
-      this.typed.currentWordId,
-      this.bSplit.length - 1,
-      this.currentWordLen,
-      this.currentTypedLen
-    );
-
     return (
       this.typed.currentWordId === this.bSplit.length - 1 &&
       this.currentWordLen === this.currentTypedLen

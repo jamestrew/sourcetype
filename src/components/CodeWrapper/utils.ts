@@ -2,7 +2,10 @@ import { ENTER_CODE } from "utils/constants";
 import { Typed } from "./types";
 
 export const stringifyTyped = (input: Typed["current"]): string => {
-  return input.map((i) => i.letter).reduce((r, i) => r + i, "");
+  return input
+    .map((i) => i.letter)
+    .filter((char) => char !== ENTER_CODE)
+    .reduce((word, char) => word + char, "");
 };
 
 export const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
