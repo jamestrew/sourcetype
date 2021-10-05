@@ -118,7 +118,8 @@ input {
   display: block;
 }
 
-#focusWarning {
+#focusWarning,
+#endScreen {
   text-align: center;
   height: 0;
   line-height: 150px;

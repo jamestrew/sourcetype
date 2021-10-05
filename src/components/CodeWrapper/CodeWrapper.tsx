@@ -4,13 +4,7 @@ import { Word } from "../Word";
 import { Tab } from "../Tab";
 import { TAB_CODE, BACKSPACE, ENTER_CODE } from "../../utils/constants";
 import createKeyHandler from "./keyHandler";
-import {
-  isWordComplete,
-  stringifyTyped,
-  bisectTyped,
-  getCurrentTyped,
-  bisectTypedClean,
-} from "./utils";
+import { isWordComplete, stringifyTyped, bisectTyped } from "./utils";
 
 import { Blurred, CursorPos, Hidden, ICodeWrapper, Typed } from "./types";
 
@@ -37,7 +31,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   useEffect(() => {
     setCursorPos({ x: curXStart, y: curYStart });
     setTyped({ currentWordId: 0, current: [] });
-  }, [sSplitCode, bSplitCode]);
+  }, [sSplitCode, bSplitCode, endScreen]);
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -78,7 +72,10 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   let wordIdx = 0;
   return (
     <>
-      <div id="endScreen" className={endScreen}></div>
+      {/* TODO: probably should make this into it's own component */}
+      <div id="endScreen" className={endScreen}>
+        <h1 className="text-red-500">ROUND OVER</h1>
+      </div>
       <div
         id="focusWarning"
         data-testid="focusWarning"
