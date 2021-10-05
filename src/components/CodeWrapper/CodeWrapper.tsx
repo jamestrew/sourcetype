@@ -32,13 +32,9 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   const [focusWarning, setFocusWarning] = useState<FocusWarning>("hidden");
   const [blurred, setBlurred] = useState<Blurred>("");
 
-  const clearCurTyped = () => {
+  useEffect(() => {
     setCursorPos({ x: curXStart, y: curYStart });
     setTyped({ currentWordId: 0, current: [] });
-  };
-
-  useEffect(() => {
-    clearCurTyped();
   }, [sSplitCode, bSplitCode]);
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
