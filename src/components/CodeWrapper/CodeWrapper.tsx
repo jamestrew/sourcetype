@@ -1,4 +1,4 @@
-import { KeyboardEvent, FC, useState, useRef } from "react";
+import { KeyboardEvent, FC, useState, useRef, useEffect } from "react";
 import { Cursor } from "../Cursor";
 import { Word } from "../Word";
 import { Tab } from "../Tab";
@@ -31,6 +31,11 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   const blurCodeRef = useRef<HTMLParagraphElement>(null);
   const [focusWarning, setFocusWarning] = useState<FocusWarning>("hidden");
   const [blurred, setBlurred] = useState<Blurred>("");
+
+  useEffect(() => {
+    setCursorPos({ x: curXStart, y: curYStart });
+    setTyped({ currentWordId: 0, current: [] });
+  }, [sSplitCode, bSplitCode]);
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
