@@ -52,6 +52,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
 
     setCursorPos(keyHandler.newCursorPos);
     setTyped(keyHandler.newTyped);
+    if (keyHandler.isEnd()) console.log("IS END");
   };
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {

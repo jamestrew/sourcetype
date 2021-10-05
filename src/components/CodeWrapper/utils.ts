@@ -1,3 +1,4 @@
+import { ENTER_CODE } from "utils/constants";
 import { Typed } from "./types";
 
 export const stringifyTyped = (input: Typed["current"]): string => {
@@ -33,4 +34,13 @@ export const getCurrentTyped = (typed: Typed): Typed["current"] => {
 
 export const isWordComplete = (wordId: number, typed: Typed): boolean => {
   return wordId < typed.currentWordId;
+};
+
+export const bisectTypedClean = (
+  wordId: number,
+  typed: Typed
+): Typed["current"] => {
+  return bisectTyped(wordId, typed).filter(
+    (char) => char.letter !== ENTER_CODE
+  );
 };
