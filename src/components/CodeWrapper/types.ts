@@ -33,5 +33,5 @@ export type CursorPos = {
   y: number;
 };
 
-export type FocusWarning = "hidden" | "";
+export type Hidden = "hidden" | "";
 export type Blurred = "blurred" | "";

@@ -11,7 +11,7 @@ import {
   getCurrentTyped,
 } from "./utils";
 
-import { Blurred, CursorPos, FocusWarning, ICodeWrapper, Typed } from "./types";
+import { Blurred, CursorPos, Hidden, ICodeWrapper, Typed } from "./types";
 
 export const curXStep = 0.582;
 export const curYStep = 1.875;
@@ -29,7 +29,8 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   });
   const focusInputRef = useRef<HTMLInputElement>(null);
   const blurCodeRef = useRef<HTMLParagraphElement>(null);
-  const [focusWarning, setFocusWarning] = useState<FocusWarning>("hidden");
+  const [focusWarning, setFocusWarning] = useState<Hidden>("hidden");
+  const [endScreen, setEndScreen] = useState<Hidden>("hidden");
   const [blurred, setBlurred] = useState<Blurred>("");
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -47,6 +48,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
 
     setCursorPos(keyHandler.newCursorPos);
     setTyped(keyHandler.newTyped);
+    if (keyHandler.IsEnd()) setEndScreen("");
   };
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -70,6 +72,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   let wordIdx = 0;
   return (
     <>
+      <div id="endScreen" className={endScreen}></div>
       <div
         id="focusWarning"
         data-testid="focusWarning"
