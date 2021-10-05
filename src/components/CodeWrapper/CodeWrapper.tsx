@@ -1,4 +1,4 @@
-import { KeyboardEvent, FC, useState, useRef } from "react";
+import { KeyboardEvent, FC, useState, useRef, useEffect } from "react";
 import { Cursor } from "../Cursor";
 import { Word } from "../Word";
 import { Tab } from "../Tab";
@@ -9,6 +9,7 @@ import {
   stringifyTyped,
   bisectTyped,
   getCurrentTyped,
+  bisectTypedClean,
 } from "./utils";
 
 import { Blurred, CursorPos, Hidden, ICodeWrapper, Typed } from "./types";
@@ -33,6 +34,11 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   const [endScreen, setEndScreen] = useState<Hidden>("hidden");
   const [blurred, setBlurred] = useState<Blurred>("");
 
+  useEffect(() => {
+    setCursorPos({ x: curXStart, y: curYStart });
+    setTyped({ currentWordId: 0, current: [] });
+  }, [sSplitCode, bSplitCode]);
+
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     const keyHandler = createKeyHandler({
@@ -48,7 +54,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
 
     setCursorPos(keyHandler.newCursorPos);
     setTyped(keyHandler.newTyped);
-    if (keyHandler.IsEnd()) setEndScreen("");
+    if (keyHandler.isEnd()) setEndScreen("");
   };
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -102,7 +108,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
                   <Word
                     key={i}
                     text={wd}
-                    value={currentTypedWord(typed, i)}
+                    value={stringifyTyped(bisectTyped(i, typed)).split("")}
                     isComplete={isWordComplete(i, typed)}
                   />
                 );
@@ -117,7 +123,6 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
           data-testid="codeInput"
           ref={focusInputRef}
           tabIndex={0}
-          defaultValue={stringifyTyped(getCurrentTyped(typed))}
           autoComplete="off"
           onKeyPress={handleKeyPress}
           onKeyDown={(e) => e.key === BACKSPACE && handleKeyPress(e)}
@@ -129,6 +134,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   );
 };
 
+// FIX: deprecated
 const currentTypedWord = (typed: Typed, idx: number): string[] => {
   return stringifyTyped(bisectTyped(idx, typed))
     .replaceAll(ENTER_CODE, "")

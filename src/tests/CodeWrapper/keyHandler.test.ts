@@ -44,7 +44,6 @@ describe("LETTERS", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     handler.handleKey();
@@ -86,7 +85,6 @@ describe("LETTERS", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -107,7 +105,6 @@ describe("LETTERS", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(() => handler.ignoreInput()).toThrowError(
@@ -130,7 +127,6 @@ describe("LETTERS", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(() => handler.ignoreInput()).toThrowError(
@@ -152,7 +148,6 @@ describe("LETTERS", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(() => handler.ignoreInput()).toThrowError(
@@ -177,7 +172,6 @@ describe("SPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -202,7 +196,6 @@ describe("SPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -235,7 +228,6 @@ describe("SPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -259,7 +251,6 @@ describe("SPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     handler.handleKey();
@@ -292,7 +283,6 @@ describe("SPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     handler.handleKey();
@@ -328,7 +318,6 @@ describe("SPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     handler.handleKey();
@@ -364,7 +353,6 @@ describe("ENTER", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -388,7 +376,6 @@ describe("ENTER", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -421,7 +408,6 @@ describe("ENTER", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(false);
@@ -466,7 +452,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -491,7 +476,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -516,7 +500,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(false);
@@ -550,7 +533,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(true);
@@ -584,7 +566,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(false);
@@ -608,7 +589,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(false);
@@ -643,7 +623,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(false);
@@ -678,7 +657,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(false);
@@ -713,7 +691,6 @@ describe("BACKSPACE", () => {
       cursorPos,
       sSplit: sCode,
       bSplit: bCode,
-      tabSize: 2,
     });
 
     expect(handler.ignoreInput()).toBe(false);
@@ -745,7 +722,6 @@ describe("createKeyHandler", () => {
     cursorPos,
     sSplit: sCode,
     bSplit: bCode,
-    tabSize: 2,
   };
 
   it("letters", () => {
@@ -766,5 +742,45 @@ describe("createKeyHandler", () => {
   it("backspace", () => {
     arg.key = BACKSPACE;
     expect(createKeyHandler(arg)).toBeInstanceOf(BackspaceHandler);
+  });
+});
+
+describe("isEnd", () => {
+  const bCode = ["foo"];
+  const cursorPos = { x: 0, y: 0 };
+
+  it("at end", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [
+        { wordId: 0, letter: "f" },
+        { wordId: 0, letter: "o" },
+      ],
+    };
+    const handler = new KeyHandler({
+      key: "o",
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+    });
+    handler.handleKey();
+    expect(handler.isEnd()).toBe(true);
+  });
+
+  it("not at end", () => {
+    const typed = {
+      currentWordId: 0,
+      current: [{ wordId: 0, letter: "f" }],
+    };
+    const handler = new KeyHandler({
+      key: "o",
+      typed,
+      cursorPos,
+      sSplit: sCode,
+      bSplit: bCode,
+    });
+    handler.handleKey();
+    expect(handler.isEnd()).toBe(false);
   });
 });

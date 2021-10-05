@@ -1,7 +1,11 @@
+import { ENTER_CODE } from "utils/constants";
 import { Typed } from "./types";
 
 export const stringifyTyped = (input: Typed["current"]): string => {
-  return input.map((i) => i.letter).reduce((r, i) => r + i, "");
+  return input
+    .map((i) => i.letter)
+    .filter((char) => char !== ENTER_CODE)
+    .reduce((word, char) => word + char, "");
 };
 
 export const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
@@ -33,4 +37,13 @@ export const getCurrentTyped = (typed: Typed): Typed["current"] => {
 
 export const isWordComplete = (wordId: number, typed: Typed): boolean => {
   return wordId < typed.currentWordId;
+};
+
+export const bisectTypedClean = (
+  wordId: number,
+  typed: Typed
+): Typed["current"] => {
+  return bisectTyped(wordId, typed).filter(
+    (char) => char.letter !== ENTER_CODE
+  );
 };
