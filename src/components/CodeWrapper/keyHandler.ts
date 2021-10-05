@@ -7,7 +7,12 @@ import {
 } from "../../utils/constants";
 import { curXStart, curXStep, curYStep } from "./CodeWrapper";
 import { IKeyHandler, KeyHandlerArgs, Typed, CursorPos } from "./types";
-import { bisectTyped, getCurrentTyped, stringifyTyped } from "./utils";
+import {
+  bisectTyped,
+  bisectTypedClean,
+  getCurrentTyped,
+  stringifyTyped,
+} from "./utils";
 
 const OVERFLOW_LIMIT = 10;
 
@@ -54,6 +59,26 @@ class KeyHandler implements IKeyHandler {
       cursorPos: this.getCursorPos(),
       typed: this.getTyped(),
     };
+  }
+
+  isEnd(): boolean {
+    if (!this.results) throw new Error("Inputs not yet handled");
+    if (this.key === SPACE || this.key === BACKSPACE || this.key === ENTER) {
+      return false;
+    }
+
+    // BUG: newline typedLen is 1 longer than is should be
+    console.log(
+      this.typed.currentWordId,
+      this.bSplit.length - 1,
+      this.currentWordLen,
+      this.currentTypedLen
+    );
+
+    return (
+      this.typed.currentWordId === this.bSplit.length - 1 &&
+      this.currentWordLen === this.currentTypedLen
+    );
   }
 
   get newCursorPos(): CursorPos {
@@ -129,7 +154,7 @@ class KeyHandler implements IKeyHandler {
   }
 
   protected typedLen(wordId: number): number {
-    return bisectTyped(wordId, this.typed).length;
+    return bisectTypedClean(wordId, this.typed).length;
   }
 
   protected wordLen(wordId: number): number {
