@@ -6,7 +6,7 @@ import { TAB_CODE, BACKSPACE, ENTER_CODE } from "../../utils/constants";
 import createKeyHandler from "./keyHandler";
 import { isWordComplete, stringifyTyped, bisectTyped } from "./utils";
 
-import { Blurred, CursorPos, Hidden, ICodeWrapper, Typed } from "./types";
+import { WrapClass, CursorPos, Hidden, ICodeWrapper, Typed } from "./types";
 
 export const curXStep = 0.582;
 export const curYStep = 1.875;
@@ -24,14 +24,14 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
   });
   const focusInputRef = useRef<HTMLInputElement>(null);
   const blurCodeRef = useRef<HTMLParagraphElement>(null);
-  const [focusWarning, setFocusWarning] = useState<Hidden>("hidden");
-  const [endScreen, setEndScreen] = useState<Hidden>("hidden");
-  const [blurred, setBlurred] = useState<Blurred>("");
+  const [focus, setFocus] = useState(true);
+  const [end, setEnd] = useState(false);
+  const [wrapClass, setWrapClass] = useState<WrapClass>("");
 
   useEffect(() => {
     setCursorPos({ x: curXStart, y: curYStart });
     setTyped({ currentWordId: 0, current: [] });
-  }, [sSplitCode, bSplitCode, endScreen]);
+  }, [sSplitCode, bSplitCode, end]);
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -48,52 +48,64 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
 
     setCursorPos(keyHandler.newCursorPos);
     setTyped(keyHandler.newTyped);
-    if (keyHandler.isEnd()) setEndScreen("");
+    if (keyHandler.isEnd()) {
+      setEnd(true);
+      setWrapClass("endscreen");
+    }
   };
 
   const handleClickToFocus = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    if (!focusInputRef || !focusInputRef.current) return;
+    if (!focusInputRef || !focusInputRef.current || end) return;
     focusInputRef.current.focus();
-    setFocusWarning("hidden");
-    setBlurred("");
+    setFocus(true);
+    setWrapClass("");
   };
 
   const handleFocusOut = (event: React.FocusEvent<HTMLInputElement>) => {
     event.preventDefault();
+    if (end) return;
     setTimeout(() => {
       if (focusInputRef.current !== document.activeElement) {
-        setFocusWarning("");
-        setBlurred("blurred");
+        setFocus(false);
+        setWrapClass("blurred");
       }
     }, 1000);
   };
 
   let wordIdx = 0;
   return (
-    <>
+    <div id="codeWrapper">
       {/* TODO: probably should make this into it's own component */}
-      <div id="endScreen" className={endScreen}>
+      <div id="endScreen" className={end ? "" : "hidden"}>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
+        <h1 className="text-red-500">ROUND OVER</h1>
         <h1 className="text-red-500">ROUND OVER</h1>
       </div>
       <div
         id="focusWarning"
         data-testid="focusWarning"
-        className={focusWarning}
+        className={focus ? "hidden" : ""}
       >
         Click to focus
       </div>
       <div
-        id="codeWrapper"
         data-testid="codeWrapper"
-        className={blurred}
+        className={wrapClass}
         onClick={handleClickToFocus}
         ref={blurCodeRef}
       >
         <Cursor hidden={false} xpad={cursorPos.x} ypad={cursorPos.y} />
         {sSplitCode.map((line, lineNum) => {
           return (
-            <div className="flex flex-wrap WordList" key={lineNum}>
+            <div className="flex WordList" key={lineNum}>
               {line.map((wd, wdNum) => {
                 if (wd === TAB_CODE)
                   return (
@@ -127,7 +139,7 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
           autoFocus
         />
       </div>
-    </>
+    </div>
   );
 };
 

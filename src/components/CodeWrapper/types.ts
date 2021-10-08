@@ -34,4 +34,4 @@ export type CursorPos = {
 };
 
 export type Hidden = "hidden" | "";
-export type Blurred = "blurred" | "";
+export type WrapClass = "blurred" | "endscreen" | "";
