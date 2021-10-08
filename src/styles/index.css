@@ -76,6 +76,10 @@ input {
   -webkit-filter: blur(4px);
 }
 
+.endscreen {
+  opacity: 0;
+}
+
 .WordList {
   @apply text-2xl;
   font-variant: no-common-ligatures;
@@ -126,4 +130,11 @@ input {
   position: relative;
   user-select: none;
   pointer-events: none;
+}
+
+#endScreen {
+  text-align: center;
+  position: relative;
+  height: 10;
+  z-index: 999;
 }
