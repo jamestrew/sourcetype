@@ -2,11 +2,11 @@ import { KeyboardEvent, FC, useState, useRef, useEffect } from "react";
 import { Cursor } from "../Cursor";
 import { Word } from "../Word";
 import { Tab } from "../Tab";
-import { TAB_CODE, BACKSPACE, ENTER_CODE } from "../../utils/constants";
+import { TAB_CODE, BACKSPACE } from "../../utils/constants";
 import createKeyHandler from "./keyHandler";
 import { isWordComplete, stringifyTyped, bisectTyped } from "./utils";
 
-import { WrapClass, CursorPos, Hidden, ICodeWrapper, Typed } from "./types";
+import { WrapClass, CursorPos, ICodeWrapper, Typed } from "./types";
 
 export const curXStep = 0.582;
 export const curYStep = 1.875;
@@ -141,15 +141,4 @@ export const CodeWrapper: FC<ICodeWrapper> = ({ sSplitCode, bSplitCode }) => {
       </div>
     </div>
   );
-};
-
-// FIX: deprecated
-const currentTypedWord = (typed: Typed, idx: number): string[] => {
-  return stringifyTyped(bisectTyped(idx, typed))
-    .replaceAll(ENTER_CODE, "")
-    .split("");
-};
-
-export const testing = {
-  currentTypedWord,
 };
