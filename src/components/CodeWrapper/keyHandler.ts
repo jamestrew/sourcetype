@@ -16,6 +16,11 @@ import {
 
 const OVERFLOW_LIMIT = 10;
 
+type sIndex = {
+  lineNum: number;
+  wordNum: number;
+};
+
 class KeyHandler implements IKeyHandler {
   key: string;
   typed: Typed;
@@ -38,7 +43,7 @@ class KeyHandler implements IKeyHandler {
     if (this.key === SPACE || this.key === BACKSPACE || this.key === ENTER)
       throw new Error(`${this.key} being handled by base KeyHandler`);
 
-    return this.currentWordLen + OVERFLOW_LIMIT <= this.currentTypedLen;
+    return this.wordLen() + OVERFLOW_LIMIT <= this.typedLen();
   }
 
   getCursorPos(): CursorPos {
@@ -69,7 +74,7 @@ class KeyHandler implements IKeyHandler {
 
     return (
       this.typed.currentWordId === this.bSplit.length - 1 &&
-      this.currentWordLen === this.currentTypedLen
+      this.wordLen() === this.typedLen()
     );
   }
 
@@ -98,27 +103,36 @@ class KeyHandler implements IKeyHandler {
   }
 
   protected get currentCursorOffset(): number {
-    return Math.max(0, this.currentWordLen - this.currentTypedLen);
+    return Math.max(0, this.wordLen() - this.typedLen());
   }
 
   protected get prevCursorOffset(): number {
     return Math.max(0, this.prevWordLen - this.prevTypedLen);
   }
 
-  protected get cursorAtEOL(): boolean {
+  protected atEndOfLine(wordId: number = this.typed.currentWordId): boolean {
+    // TODO: convert to utilize sIndices
     let wordIdx = 0;
     for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
       for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
-        if (wordIdx > this.typed.currentWordId) return false;
-        if (
-          this.typed.currentWordId === wordIdx &&
-          wordNum === this.sSplit[lineNum].length - 1
-        )
+        if (wordIdx > wordId) return false;
+        if (wordId === wordIdx && wordNum === this.sSplit[lineNum].length - 1)
           return true;
         if (this.sSplit[lineNum][wordNum] !== TAB_CODE) wordIdx++;
       }
     }
     return false;
+  }
+
+  protected sIndices(wordId: number = this.typed.currentWordId): sIndex {
+    let wordIdx = 0;
+    for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
+      for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
+        if (wordId === wordIdx) return { lineNum, wordNum };
+        if (this.sSplit[lineNum][wordNum] !== TAB_CODE) wordIdx++;
+      }
+    }
+    return { lineNum: -1, wordNum: -1 };
   }
 
   protected get cursorAtStart(): boolean {
@@ -145,12 +159,30 @@ class KeyHandler implements IKeyHandler {
     return this.wordLen(this.typed.currentWordId - 1);
   }
 
-  protected typedLen(wordId: number): number {
+  protected typedLen(wordId: number = this.typed.currentWordId): number {
     return bisectTypedClean(wordId, this.typed).length;
   }
 
-  protected wordLen(wordId: number): number {
+  protected wordLen(wordId: number = this.typed.currentWordId): number {
     return this.bSplit[wordId].length;
+  }
+
+  protected get startNewLine(): boolean {
+    return this.atEndOfLine(this.typed.currentWordId - 1);
+  }
+
+  protected lineLength(wordId: number): number {
+    let result = -1; // counter act first += 1
+    const line = this.sSplit[this.sIndices(wordId).lineNum];
+    for (let wordNum = 0; wordNum < line.length; wordNum++) {
+      result += 1; // space per word
+      if (line[wordNum] === TAB_CODE) {
+        result += 1;
+      } else {
+        result += line[wordNum].length;
+      }
+    }
+    return result;
   }
 }
 
@@ -160,17 +192,22 @@ class BackspaceHandler extends KeyHandler implements IKeyHandler {
   }
 
   getCursorPos(): CursorPos {
-    let offset = 0;
+    const result: CursorPos = this.cursorPos;
+    let xOffset = 1;
+    let yOffset = 0;
 
-    if (
-      this.startOfWord &&
-      !this.prevTypedCorrectly &&
-      this.typed.currentWordId !== 0
-    ) {
-      offset = this.prevCursorOffset + 1;
+    if (this.startOfWord && !this.prevTypedCorrectly) {
+      if (this.startNewLine) {
+        result.x = curXStart;
+        xOffset = -this.lineLength(this.typed.currentWordId - 1);
+        yOffset = 1;
+      } else {
+        xOffset = this.prevCursorOffset + 1;
+      }
     }
-    this.cursorPos.x -= offset ? curXStep * offset : curXStep;
-    return this.cursorPos;
+    result.x -= xOffset * curXStep;
+    result.y -= yOffset * curYStep;
+    return result;
   }
 
   getTyped(): Typed {
@@ -182,7 +219,7 @@ class BackspaceHandler extends KeyHandler implements IKeyHandler {
 
 class EnterHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return !this.cursorAtEOL;
+    return !this.atEndOfLine();
   }
 
   getCursorPos(): CursorPos {
@@ -225,7 +262,7 @@ class EnterHandler extends KeyHandler implements IKeyHandler {
 
 class SpaceHandler extends KeyHandler implements IKeyHandler {
   ignoreInput(): boolean {
-    return this.cursorAtEOL || this.startOfWord;
+    return this.atEndOfLine() || this.startOfWord;
   }
 
   getCursorPos(): CursorPos {

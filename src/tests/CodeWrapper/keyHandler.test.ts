@@ -568,7 +568,15 @@ describe("BACKSPACE", () => {
       bSplit: bCode,
     });
 
+    const cursorPosResult = {
+      x: curXStart + 11 * curXStep,
+      y: curYStart,
+    };
     expect(handler.ignoreInput()).toBe(false);
+    handler.handleKey();
+    expect(handler.getTyped()).toEqual(typed);
+    expect(handler.newCursorPos.x).toBeCloseTo(cursorPosResult.x);
+    expect(handler.newCursorPos.y).toBeCloseTo(cursorPosResult.y);
   });
 
   it("delete letter", () => {
