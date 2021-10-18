@@ -539,6 +539,8 @@ describe("BACKSPACE", () => {
   });
 
   it("IGNORE: at start of new line - prev word incorrect", () => {
+    const current = [];
+
     const typed = {
       currentWordId: 3,
       current: [
@@ -568,7 +570,15 @@ describe("BACKSPACE", () => {
       bSplit: bCode,
     });
 
+    const cursorPosResult = {
+      x: curXStart + 11 * curXStep,
+      y: curYStart,
+    };
     expect(handler.ignoreInput()).toBe(false);
+    handler.handleKey();
+    expect(handler.getTyped()).toEqual(typed);
+    expect(handler.newCursorPos.x).toBeCloseTo(cursorPosResult.x);
+    expect(handler.getCursorPos().y).toBeCloseTo(cursorPosResult.y);
   });
 
   it("delete letter", () => {

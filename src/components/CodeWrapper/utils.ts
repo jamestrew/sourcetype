@@ -32,7 +32,7 @@ export const bisectTyped = (wordId: number, typed: Typed): Typed["current"] => {
 };
 
 export const getCurrentTyped = (typed: Typed): Typed["current"] => {
-  return bisectTyped(typed.currentWordId, typed);
+  return bisectTypedClean(typed.currentWordId, typed);
 };
 
 export const isWordComplete = (wordId: number, typed: Typed): boolean => {
