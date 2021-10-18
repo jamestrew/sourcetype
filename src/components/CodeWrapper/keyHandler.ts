@@ -121,6 +121,17 @@ class KeyHandler implements IKeyHandler {
     return false;
   }
 
+  protected sIndices(wordId: number = this.typed.currentWordId): sIndex {
+    let wordIdx = 0;
+    for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
+      for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
+        if (wordId === wordIdx) return { lineNum, wordNum };
+        if (this.sSplit[lineNum][wordNum] !== TAB_CODE) wordIdx++;
+      }
+    }
+    return { lineNum: -1, wordNum: -1 };
+  }
+
   protected get cursorAtStart(): boolean {
     return this.cursorPos.x === curXStart;
   }
