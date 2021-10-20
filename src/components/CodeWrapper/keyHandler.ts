@@ -95,9 +95,8 @@ class KeyHandler implements IKeyHandler {
   protected get prevTypedCorrectly(): boolean {
     if (this.typed.current.length === 0) return true;
 
-    const prevTypedId = this.typed.currentWordId - 1;
-    const prevTyped = stringifyTyped(bisectTyped(prevTypedId, this.typed));
-    return this.bSplit[prevTypedId] === prevTyped;
+    const prevTyped = stringifyTyped(bisectTyped(this.prevWordId, this.typed));
+    return this.bSplit[this.prevWordId] === prevTyped;
   }
 
   protected get latestWordId(): number {
@@ -139,6 +138,13 @@ class KeyHandler implements IKeyHandler {
     return getCurrentTyped(this.typed).length === 0;
   }
 
+  protected get prevWordId(): number {
+    for (let idx = this.typed.currentWordId - 1; idx >= 0; idx--) {
+      if (this.typed.current[idx].letter !== ENTER_CODE) return idx;
+    }
+    return -1;
+  }
+
   protected get currentTypedLen(): number {
     return this.typedLen(this.typed.currentWordId);
   }
@@ -148,11 +154,11 @@ class KeyHandler implements IKeyHandler {
   }
 
   protected get prevTypedLen(): number {
-    return this.typedLen(this.typed.currentWordId - 1);
+    return this.typedLen(this.prevWordId);
   }
 
   protected get prevWordLen(): number {
-    return this.wordLen(this.typed.currentWordId - 1);
+    return this.wordLen(this.prevWordId);
   }
 
   protected typedLen(wordId: number = this.typed.currentWordId): number {
@@ -164,7 +170,7 @@ class KeyHandler implements IKeyHandler {
   }
 
   protected get startNewLine(): boolean {
-    return this.atEndOfLine(this.typed.currentWordId - 1);
+    return this.atEndOfLine(this.prevWordId);
   }
 
   protected lineLength(wordId: number): number {
@@ -196,7 +202,7 @@ class BackspaceHandler extends KeyHandler implements IKeyHandler {
     if (this.startOfWord && !this.prevTypedCorrectly) {
       if (this.startNewLine) {
         result.x = curXStart;
-        xOffset = -this.lineLength(this.typed.currentWordId - 1);
+        xOffset = -this.lineLength(this.prevWordId);
         yOffset = 1;
       } else {
         xOffset = this.prevCursorOffset + 1;
