@@ -111,17 +111,9 @@ class KeyHandler implements IKeyHandler {
   }
 
   protected atEndOfLine(wordId: number = this.typed.currentWordId): boolean {
-    // TODO: convert to utilize sIndices
-    let wordIdx = 0;
-    for (let lineNum = 0; lineNum < this.sSplit.length; lineNum++) {
-      for (let wordNum = 0; wordNum < this.sSplit[lineNum].length; wordNum++) {
-        if (wordIdx > wordId) return false;
-        if (wordId === wordIdx && wordNum === this.sSplit[lineNum].length - 1)
-          return true;
-        if (this.sSplit[lineNum][wordNum] !== TAB_CODE) wordIdx++;
-      }
-    }
-    return false;
+    const indices = this.sIndices(wordId);
+    const lineLength = this.sSplit[indices.lineNum].length;
+    return indices.wordNum === lineLength - 1;
   }
 
   protected sIndices(wordId: number = this.typed.currentWordId): sIndex {
