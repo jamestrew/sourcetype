@@ -47,18 +47,22 @@ class KeyHandler implements IKeyHandler {
   }
 
   getCursorPos(): CursorPos {
+    // TODO: convert to getter
     return { x: this.cursorPos.x + curXStep, y: this.cursorPos.y };
   }
 
   getTyped(): Typed {
-    this.typed.current.push({
-      wordId: this.typed.currentWordId,
+    // TODO: convert to getter
+    const result = this.typed;
+    result.current.push({
+      wordId: result.currentWordId,
       letter: this.key,
     });
-    return { ...this.typed };
+    return { ...result };
   }
 
   handleKey(): void {
+    // TODO: DEPRECATED - remove
     // deterministic call order
     this.results = {
       cursorPos: this.getCursorPos(),
@@ -184,6 +188,7 @@ class BackspaceHandler extends KeyHandler implements IKeyHandler {
   }
 
   getCursorPos(): CursorPos {
+    // TODO: convert to getter
     const result: CursorPos = this.cursorPos;
     let xOffset = 1;
     let yOffset = 0;
@@ -203,9 +208,11 @@ class BackspaceHandler extends KeyHandler implements IKeyHandler {
   }
 
   getTyped(): Typed {
-    this.typed.current.pop();
-    this.typed.currentWordId = this.latestWordId;
-    return { ...this.typed };
+    // TODO: convert to getter
+    const result = this.typed;
+    result.current.pop();
+    result.currentWordId = this.latestWordId;
+    return result;
   }
 }
 
@@ -215,18 +222,22 @@ class EnterHandler extends KeyHandler implements IKeyHandler {
   }
 
   getCursorPos(): CursorPos {
-    this.cursorPos.y += curYStep;
-    this.cursorPos.x = this.tabSize * curXStep * this.indentCount();
-    return this.cursorPos;
+    // TODO: convert to getter
+    const result = this.cursorPos;
+    result.y += curYStep;
+    result.x = this.tabSize * curXStep * this.indentCount();
+    return result;
   }
 
   getTyped(): Typed {
-    this.typed.currentWordId += 1;
-    this.typed.current.push({
-      wordId: this.typed.currentWordId,
+    // TODO: convert to getter
+    const result = this.typed;
+    result.currentWordId += 1;
+    result.current.push({
+      wordId: result.currentWordId,
       letter: ENTER_CODE,
     });
-    return { ...this.typed };
+    return { ...result };
   }
 
   indentCount(): number {
@@ -258,18 +269,22 @@ class SpaceHandler extends KeyHandler implements IKeyHandler {
   }
 
   getCursorPos(): CursorPos {
+    // TODO: convert to getter
+    const result = this.cursorPos;
     const offset = this.currentCursorOffset + 1;
-    this.cursorPos.x += curXStep * offset;
-    return this.cursorPos;
+    result.x += curXStep * offset;
+    return result;
   }
 
   getTyped(): Typed {
-    this.typed.currentWordId += 1;
-    this.typed.current.push({
-      wordId: this.typed.currentWordId,
+    // TODO: convert to getter
+    const result = this.typed;
+    result.currentWordId += 1;
+    result.current.push({
+      wordId: result.currentWordId,
       letter: " ",
     });
-    return { ...this.typed };
+    return { ...result };
   }
 }
 
